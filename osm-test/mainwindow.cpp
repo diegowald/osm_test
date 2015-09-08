@@ -1,9 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
+//#include <QDebug>
 #include <QtConcurrent/QtConcurrent>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QVariant>
+#include <sqlite3.h>
+#include <QSqlDriver>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,7 +27,30 @@ MainWindow::MainWindow(QWidget *parent) :
 
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("map.sqlite");
+
     qDebug() << db.open();
+
+    QVariant v = db.driver()->handle();
+
+    qDebug() << v.typeName();
+    qDebug() << v.data();
+    if (v.isValid() && qstrcmp(v.typeName(), "sqlite3*")==0)
+    {
+        // v.data() returns a pointer to the handle
+        sqlite3 *handle = *static_cast<sqlite3 **>(v.data());
+        //sqlite3 *handle = (sqlite3*)(v.data());
+        if (handle != 0)
+        { // check that it is not NULL
+            sqlite3_enable_load_extension(handle, 1);
+        }
+        else
+        {
+            qDebug() << "handle is null....";
+        }
+    }
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +132,7 @@ void MainWindow::queryDatabase(double X, double Y)
             " Distance(osm_nodes.geometry, PointFromText('POINT ( %1 %2)')) < 5 "
             " )";
     QString s = sql.arg(X).arg(Y);
-    qDebug() << s;
+    //qDebug() << s;
     QSqlQuery query(s);
 
     /*if (query.exec())
@@ -118,6 +144,7 @@ void MainWindow::queryDatabase(double X, double Y)
     /*}
     else
     {*/
-        qDebug() << query.lastError().text();
+        QString e = query.lastError().text();
+        //qDebug() << e;
     //}
 }
