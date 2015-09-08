@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include <QtSql/QSqlDatabase>
+#include <sqlite3.h>
 
 namespace Ui {
 class MainWindow;
@@ -41,7 +41,7 @@ private:
     bool playing;
 
     QTimer *timer;
-    QSqlDatabase db;
+    sqlite3 *db;
 };
 
 #endif // MAINWINDOW_H

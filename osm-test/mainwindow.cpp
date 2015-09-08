@@ -2,11 +2,8 @@
 #include "ui_mainwindow.h"
 //#include <QDebug>
 #include <QtConcurrent/QtConcurrent>
-#include <QSqlQuery>
-#include <QSqlError>
 #include <QVariant>
 #include <sqlite3.h>
-#include <QSqlDriver>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,32 +22,18 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::on_moveLocation);
 
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("map.sqlite");
-
-    qDebug() << db.open();
-
-    QVariant v = db.driver()->handle();
-
-    qDebug() << v.typeName();
-    qDebug() << v.data();
-    if (v.isValid() && qstrcmp(v.typeName(), "sqlite3*")==0)
+    if (sqlite3_open("map.sqlite", &db) == SQLITE_OK)
     {
-        // v.data() returns a pointer to the handle
-        sqlite3 *handle = *static_cast<sqlite3 **>(v.data());
-        //sqlite3 *handle = (sqlite3*)(v.data());
-        if (handle != 0)
-        { // check that it is not NULL
-            sqlite3_enable_load_extension(handle, 1);
-        }
-        else
-        {
-            qDebug() << "handle is null....";
-        }
     }
 
+    sqlite3_enable_load_extension(db, 1);
 
+    sqlite3_stmt *statement;
+    QString sql = "SELECT load_extension(\"/usr/lib/libspatialite\"";
+    if (sqlite3_prepare(db, sql.toStdString().c_str(), -1, &statement, 0) == SQLITE_OK)
+    {
 
+    }
 }
 
 MainWindow::~MainWindow()
@@ -133,18 +116,19 @@ void MainWindow::queryDatabase(double X, double Y)
             " )";
     QString s = sql.arg(X).arg(Y);
     //qDebug() << s;
-    QSqlQuery query(s);
+
+    //QSqlQuery query(s);
 
     /*if (query.exec())
     {*/
-        while (query.next())
+        //while (query.next())
         {
 
         }
     /*}
     else
     {*/
-        QString e = query.lastError().text();
+       // QString e = query.lastError().text();
         //qDebug() << e;
     //}
 }
