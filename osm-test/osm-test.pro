@@ -13,9 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    nodeassociatedtoway.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    nodeassociatedtoway.h
 
 FORMS    += mainwindow.ui
 
@@ -32,4 +34,3 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/..
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/x86_64-linux-gnu/debug/sqlite3.lib
 else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/lib/x86_64-linux-gnu/libsqlite3.a
 
-LIBS += GL

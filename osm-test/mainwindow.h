@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include <sqlite3.h>
+#include <spatialite/sqlite3.h>
+//#include <sqlite3.h>
+#include <nodeassociatedtoway.h>
 
 namespace Ui {
 class MainWindow;
@@ -28,6 +30,12 @@ private:
     void refreshData();
     void gatherCurrentPositionData(double X, double Y);
     void queryDatabase(double X, double Y);
+
+    long  getNearestWayNode(double X, double Y);
+    long getWayByNode(long nearestNode);
+
+    QList<NodeAssociatedToWayPtr> getInfoNodes(long way_id);
+
 private:
     Ui::MainWindow *ui;
 
