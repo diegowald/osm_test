@@ -19,6 +19,7 @@ public:
     double X() const;
     double Y() const;
     QString toString() const;
+    QString value(const QString &key);
 signals:
 
 public slots:

@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui sql
+qtHaveModule(printsupport): QT += printsupport
+qtHaveModule(opengl): QT += opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,14 +20,18 @@ SOURCES += main.cpp\
     osmhandler.cpp \
     waysignaldetector.cpp \
     way.cpp \
-    osmpoint.cpp
+    osmpoint.cpp \
+    vector2d.cpp \
+    forwardview.cpp
 
 HEADERS  += mainwindow.h \
     nodeassociatedtoway.h \
     osmhandler.h \
     waysignaldetector.h \
     way.h \
-    osmpoint.h
+    osmpoint.h \
+    vector2d.h \
+    forwardview.h
 
 FORMS    += mainwindow.ui
 

@@ -6,6 +6,7 @@
 #include "nodeassociatedtoway.h"
 #include "osmhandler.h"
 #include "waysignaldetector.h"
+#include "forwardview.h"
 
 namespace Ui {
 class MainWindow;
@@ -46,6 +47,8 @@ private:
     QTimer *timer;
     OSMHandlerPtr _osmHandler;
     WaySignalDetectorPtr _signalDetector;
+
+    QGraphicsScene *forwardSignalsSchene;
 };
 
 #endif // MAINWINDOW_H

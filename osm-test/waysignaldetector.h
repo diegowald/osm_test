@@ -17,12 +17,17 @@ public:
     QList<NodeAssociatedToWayPtr> getUpcommingSignals(double &x, double &y, double &direction);
     QList<NodeAssociatedToWayPtr> getUpcommingIntersections(double &x, double &y, double &direction);
 
+private:
+    double meters2Degrees(double &meters);
+    double degrees2meters(double &degrees);
 signals:
 
 public slots:
 
 private:
     OSMHandlerPtr _handler;
+    double maxDistanceMeters;
+    double maxDistance;
 };
 
 typedef QSharedPointer<WaySignalDetector> WaySignalDetectorPtr;

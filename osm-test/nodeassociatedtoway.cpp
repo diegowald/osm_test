@@ -42,3 +42,8 @@ QString NodeAssociatedToWay::toString() const
     }
     return s;
 }
+
+QString NodeAssociatedToWay::value(const QString &key)
+{
+    return values.contains(key) ? values[key] : "x";
+}

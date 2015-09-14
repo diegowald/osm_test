@@ -162,4 +162,6 @@ void MainWindow::queryDatabase(double X, double Y)
         ui->intersections->setItem(row -1, 2, item);
         //row++;
     }
+
+    ui->forwardFrame->updateScene(X, Y, nodes, intersections);
 }

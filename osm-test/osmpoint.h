@@ -9,6 +9,9 @@ class OSMPoint : public QObject
 public:
     explicit OSMPoint(long &id, double &x, double &y, QObject *parent = 0);
 
+    double x() const;
+    double y() const;
+    long id() const;
 signals:
 
 public slots:

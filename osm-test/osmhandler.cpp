@@ -3,7 +3,7 @@
 #include <QSqlError>
 #include <QVariant>
 #include <QDebug>
-
+#include "way.h"
 
 OSMHandler::OSMHandler(const QString &databaseFile, QObject *parent) : QObject(parent)
 {
@@ -17,29 +17,42 @@ OSMHandler::~OSMHandler()
     db.close();
 }
 
-long OSMHandler::nearestWay(double &x, double &y, double &direction)
+long OSMHandler::nearestWay(double &x, double &y, double &direction, double &threshold)
 {
-    QList<long> candidates = nearestWays(x, y);
+    QList<long> candidates = nearestWays(x, y, threshold);
 
-    return candidates.count() > 0 ? candidates.at(0) : -1;
+    foreach (long way_id, candidates)
+    {
+        Way way(this, way_id);
+        if (way.pointInWay(x, y))
+            return way_id;
+    }
+    return -1;
 }
 
-QList<long> OSMHandler::nearestWays(double &x, double &y)
+QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)
 {
     QList<long> results;
 
     QString sql =
-            " select node_id, abs(x - :x) + abs(y- :y) as dst "
-            " from osm_nodes where node_id in "
-            " (select node_id from osm_way_refs where way_id in "
-            " (select way_id from osm_way_tags where k = 'highway')) "
-            " order by dst limit 1;";
+            "select osm_way_refs.way_id "
+            " from osm_nodes "
+            " inner join osm_way_refs on osm_nodes.node_id = osm_way_refs.node_id "
+            " inner join osm_way_tags on osm_way_refs.way_id = osm_way_tags.way_id "
+            " and osm_way_tags.k = 'highway' "
+            " where abs(x - :x) + abs(y- :y) < :maxDist; ";
 
 
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":x", x);
     query.bindValue(":y", y);
+    query.bindValue(":maxDist", threshold);
+qDebug() << sql;
+qDebug() << ":x" << x;
+qDebug() << ":y"<< y;
+qDebug() << ":maxDist" << threshold;
+
     if (query.exec())
     {
         while (query.next())
@@ -49,7 +62,7 @@ QList<long> OSMHandler::nearestWays(double &x, double &y)
     }
     else
     {
-        qDebug() << query.lastError().text();
+        qDebug() << sql << ": " << query.lastError().text();
     }
     return results;
 }
@@ -77,7 +90,7 @@ long OSMHandler::wayByNodeId(long nodeId)
     return -1;
 }
 
-QList<NodeAssociatedToWayPtr> OSMHandler::getInfoNodes(long way_id)
+QList<NodeAssociatedToWayPtr> OSMHandler::getInfoNodes(long way_id, double &x, double &y,  double &maxDistance)
 {
     QMap<long, NodeAssociatedToWayPtr> result;
 
@@ -86,13 +99,18 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getInfoNodes(long way_id)
             " from osm_nodes inner join "
             " osm_node_tags on osm_nodes.node_id = osm_node_tags.node_id "
             " inner join osm_way_refs on osm_nodes.node_id = osm_way_refs.node_id "
-            " where osm_way_refs.way_id = :way_id";
+            " where osm_way_refs.way_id = :way_id "
+            " and abs(x - :x) + abs(y- :y) < :maxDist;";
 
     //node_id|x|y|k|v
 
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
+    query.bindValue(":x", x);
+    query.bindValue(":y", y);
+    query.bindValue(":maxDist", maxDistance);
+
     if (query.exec())
     {
         while (query.next())
@@ -121,7 +139,7 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getInfoNodes(long way_id)
     return result.values();
 }
 
-QList<NodeAssociatedToWayPtr> OSMHandler::getIntersections(long way_id)
+QList<NodeAssociatedToWayPtr> OSMHandler::getIntersections(long way_id, double &x, double &y, double &maxDistance)
 {
     QMap<long, NodeAssociatedToWayPtr> result;
 
@@ -132,11 +150,15 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getIntersections(long way_id)
             " osm_way_refs intersections on "
             " currentway.node_id = intersections.node_id "
             " inner join osm_way_tags on osm_way_tags.way_id = intersections.way_id "
-            " where currentway.way_id = :way_id and intersections.way_id != :way_id; ";
+            " where currentway.way_id = :way_id and intersections.way_id != :way_id "
+            " and abs(x - :x) + abs(y- :y) < :maxDist;";
 
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
+    query.bindValue(":x", x);
+    query.bindValue(":y", y);
+    query.bindValue(":maxDist", maxDistance);
     if (query.exec())
     {
         while (query.next())
@@ -177,6 +199,8 @@ QList<OSMPointPtr> OSMHandler::getWayNodes(long way_id)
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
+    qDebug() << sql;
+    qDebug() << way_id;
     if (query.exec())
     {
         while (query.next())
