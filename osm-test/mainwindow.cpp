@@ -2,9 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
-#include <QVariant>
-#include <sqlite3.h>
-#include <iostream>
+//#include <QVariant>
+//#include <QSqlQuery>
+//#include <QSqlError>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,7 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::on_moveLocation);
 
-    if (sqlite3_open("map.sqlite", &db) == SQLITE_OK)
+    _osmHandler = OSMHandlerPtr::create("map.sqlite");
+    _signalDetector = WaySignalDetectorPtr::create(_osmHandler);
+
+    /*    if (sqlite3_open("map.sqlite", &db) == SQLITE_OK)
     {
     }
 
@@ -45,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
         std::string e = sqlite3_errmsg(db);
         QString e1 = QString::fromStdString(e);
         //qDebug() << e1;
-    }
+    }*/
 }
 
 MainWindow::~MainWindow()
@@ -56,10 +59,10 @@ MainWindow::~MainWindow()
 void MainWindow::on_btnSetup_released()
 {
     // Since it's a dummy test. Let's hardcode this part.
-    minX = -62.2932;
-    minY = -38.7319;
-    maxX = -62.2579;
-    maxY = -38.7132;
+    minX = -62.3155083;
+    minY = -38.7235012;
+    maxX = -62.2728802;
+    maxY = -38.6909236;
     elapsedTime = 0.;
     refreshData();
 }
@@ -96,8 +99,10 @@ void MainWindow::on_btnPlayStop_released()
 void MainWindow::on_moveLocation()
 {
     double delta = (maxY - minY) / 100;
+    qDebug() << delta;
     currentY+= delta;
     delta = (maxX - minX) / 100;
+    qDebug() << delta;
     currentX += delta;
     elapsedTime++;
     if (elapsedTime > 100)
@@ -105,6 +110,7 @@ void MainWindow::on_moveLocation()
         currentY = minY;
         elapsedTime = 0;
     }
+    qDebug() << "x= " << currentX << " y= " << currentY;
     gatherCurrentPositionData(currentX, currentY);
     refreshData();
 }
@@ -112,164 +118,48 @@ void MainWindow::on_moveLocation()
 
 void MainWindow::gatherCurrentPositionData(double X, double Y)
 {
-    QFuture<void> future = QtConcurrent::run(this, &MainWindow::queryDatabase, X, Y);
-}
-
-
-long MainWindow::getNearestWayNode(double X, double Y)
-{
-    sqlite3_stmt *statement;
-
-    QString sql =
-            " select node_id, abs(x - %1) + abs(y- %2) as dst "
-            " from osm_nodes where node_id in "
-            " (select node_id from osm_way_refs where way_id in "
-            " (select way_id from osm_way_tags where k = 'highway')) "
-            " order by dst limit 1;";
-
-    QString s = sql.arg(X).arg(Y);
-
-    if ( sqlite3_prepare(db, s.toStdString().c_str(), -1, &statement, 0 ) == SQLITE_OK )
-    {
-        int ctotal = sqlite3_column_count(statement);
-        int res = 0;
-
-        while ( 1 )
-        {
-            res = sqlite3_step(statement);
-
-            if ( res == SQLITE_ROW )
-            {
-                for ( int i = 0; i < ctotal; i++ )
-                {
-                    std::string s = (char*)sqlite3_column_text(statement, i);
-
-                    QString res = QString::fromStdString(s);
-                    return res.toLong();
-
-                }
-            }
-
-            if ( res == SQLITE_DONE || res==SQLITE_ERROR)
-            {
-                break;
-            }
-        }
-    }
-    return -1;
-}
-
-long MainWindow::getWayByNode(long nearestNode)
-{
-    sqlite3_stmt *statement;
-
-    QString sql =
-            " select way_id from osm_way_refs where node_id = %1;";
-
-
-    QString s = sql.arg(nearestNode);
-
-    if ( sqlite3_prepare(db, s.toStdString().c_str(), -1, &statement, 0 ) == SQLITE_OK )
-    {
-        int ctotal = sqlite3_column_count(statement);
-        int res = 0;
-
-        while ( 1 )
-        {
-            res = sqlite3_step(statement);
-
-            if ( res == SQLITE_ROW )
-            {
-                for ( int i = 0; i < ctotal; i++ )
-                {
-                    std::string s = (char*)sqlite3_column_text(statement, i);
-
-                    QString res = QString::fromStdString(s);
-                    return res.toLong();
-
-                }
-            }
-
-            if ( res == SQLITE_DONE || res==SQLITE_ERROR)
-            {
-                break;
-            }
-        }
-    }
-    return -1;
-
-}
-
-QList<NodeAssociatedToWayPtr> MainWindow::getInfoNodes(long way_id)
-{
-    QMap<QString, NodeAssociatedToWayPtr> result;
-
-    sqlite3_stmt *statement;
-
-    QString sql =
-            " select * from osm_node_tags where node_id in (select node_id from osm_way_refs where way_id = %1);";
-
-
-
-    QString s = sql.arg(way_id);
-
-    if ( sqlite3_prepare(db, s.toStdString().c_str(), -1, &statement, 0 ) == SQLITE_OK )
-    {
-        int res = 0;
-
-        while ( 1 )
-        {
-            res = sqlite3_step(statement);
-
-            if ( res == SQLITE_ROW )
-            {
-                std::string node_id = (char*)sqlite3_column_text(statement, 0);
-                std::string sub = (char*)sqlite3_column_text(statement, 1);
-                std::string key = (char*)sqlite3_column_text(statement, 2);
-                std::string value = (char*)sqlite3_column_text(statement, 3);
-
-                QString aux = QString::fromStdString(node_id);
-                if (!result.contains(aux))
-                {
-                    NodeAssociatedToWayPtr node = NodeAssociatedToWayPtr::create();
-                    result[aux] = node;
-                }
-                result[aux]->addKeyValue(QString::fromStdString(key), QString::fromStdString(value));
-            }
-
-            if ( res == SQLITE_DONE || res==SQLITE_ERROR)
-            {
-                break;
-            }
-        }
-    }
-
-    return result.values();
+    //QFuture<void> future = QtConcurrent::run(this, &MainWindow::queryDatabase, X, Y);
+    queryDatabase(X, Y);
 }
 
 void MainWindow::queryDatabase(double X, double Y)
 {
-    int nearestNode = getNearestWayNode(X, Y);
-
-    int nearestWay = getWayByNode(nearestNode);
-
-    QList<NodeAssociatedToWayPtr> nodes = getInfoNodes(nearestWay);
-    ui->tableWidget->setRowCount(0);
-
+    double direction = -1.;
+    QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction);
+    ui->nodeInformation->setRowCount(0);
 
     foreach (NodeAssociatedToWayPtr node, nodes)
     {
-        int row = ui->tableWidget->rowCount() + 1;
+        int row = ui->nodeInformation->rowCount() + 1;
 
-        ui->tableWidget->setRowCount(row);
+        ui->nodeInformation->setRowCount(row);
         QTableWidgetItem *item = new QTableWidgetItem(QString::number(node->X()));
-        ui->tableWidget->setItem(row -1, 0, item);
+        ui->nodeInformation->setItem(row -1, 0, item);
 
         item = new QTableWidgetItem(QString::number(node->Y()));
-        ui->tableWidget->setItem(row -1, 1, item);
+        ui->nodeInformation->setItem(row -1, 1, item);
 
         item = new QTableWidgetItem(node->toString());
-        ui->tableWidget->setItem(row -1, 2, item);
+        ui->nodeInformation->setItem(row -1, 2, item);
+        //row++;
+    }
+
+    QList<NodeAssociatedToWayPtr> intersections = _signalDetector->getUpcommingIntersections(X, Y, direction);
+    ui->intersections->setRowCount(0);
+
+    foreach (NodeAssociatedToWayPtr node, intersections)
+    {
+        int row = ui->intersections->rowCount() + 1;
+
+        ui->intersections->setRowCount(row);
+        QTableWidgetItem *item = new QTableWidgetItem(QString::number(node->X()));
+        ui->intersections->setItem(row -1, 0, item);
+
+        item = new QTableWidgetItem(QString::number(node->Y()));
+        ui->intersections->setItem(row -1, 1, item);
+
+        item = new QTableWidgetItem(node->toString());
+        ui->intersections->setItem(row -1, 2, item);
         //row++;
     }
 }

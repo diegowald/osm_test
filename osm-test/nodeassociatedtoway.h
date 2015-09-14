@@ -12,6 +12,8 @@ class NodeAssociatedToWay : public QObject
 public:
     explicit NodeAssociatedToWay(QObject *parent = 0);
 
+    void setCoords(double &X, double &Y);
+    void setId(long id);
     void addKeyValue(const QString &key, const QString &value);
 
     double X() const;
@@ -22,8 +24,9 @@ signals:
 public slots:
 
 private:
-    double x;
-    double y;
+    double _x;
+    double _y;
+    long _id;
     QMap<QString, QString> values;
 };
 

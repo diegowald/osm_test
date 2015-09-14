@@ -2,7 +2,17 @@
 
 NodeAssociatedToWay::NodeAssociatedToWay(QObject *parent) : QObject(parent)
 {
+}
 
+void NodeAssociatedToWay::setCoords(double &X, double &Y)
+{
+    _x = X;
+    _y = Y;
+}
+
+void NodeAssociatedToWay::setId(long id)
+{
+    _id = id;
 }
 
 void NodeAssociatedToWay::addKeyValue(const QString &key, const QString &value)
@@ -13,13 +23,13 @@ void NodeAssociatedToWay::addKeyValue(const QString &key, const QString &value)
 
 double NodeAssociatedToWay::X() const
 {
-    return x;
+    return _x;
 }
 
 
 double NodeAssociatedToWay::Y() const
 {
-    return y;
+    return _y;
 }
 
 QString NodeAssociatedToWay::toString() const
