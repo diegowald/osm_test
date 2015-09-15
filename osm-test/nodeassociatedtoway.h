@@ -20,6 +20,7 @@ public:
     double Y() const;
     QString toString() const;
     QString value(const QString &key);
+    long id() const;
 signals:
 
 public slots:

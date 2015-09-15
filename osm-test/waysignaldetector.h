@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "osmhandler.h"
+#include "way.h"
 
 // This class gathers the upcoming signals from the current way;
 
@@ -16,6 +17,10 @@ public:
 
     QList<NodeAssociatedToWayPtr> getUpcommingSignals(double &x, double &y, double &direction);
     QList<NodeAssociatedToWayPtr> getUpcommingIntersections(double &x, double &y, double &direction);
+
+    WayPtr getCurrentWay(double &x, double &y, double &direction);
+    QList<WayPtr> getIntersectionWays(QList<NodeAssociatedToWayPtr> intersections);
+
 
 private:
     double meters2Degrees(double &meters);

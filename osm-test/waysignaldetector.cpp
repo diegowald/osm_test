@@ -50,3 +50,21 @@ double WaySignalDetector::degrees2meters(double &degrees)
 {
     return degrees * 1853.2 * 60;
 }
+
+WayPtr WaySignalDetector::getCurrentWay(double &x, double &y, double &direction)
+{
+    int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
+    return WayPtr::create(_handler.data(), nearestWay);
+}
+
+QList<WayPtr> WaySignalDetector::getIntersectionWays(QList<NodeAssociatedToWayPtr> intersections)
+{
+    QList<WayPtr> result;
+
+    foreach (NodeAssociatedToWayPtr node, intersections)
+    {
+        result.append(WayPtr::create(_handler.data(), node->id()));
+    }
+
+    return result;
+}

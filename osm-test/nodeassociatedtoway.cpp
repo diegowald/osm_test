@@ -47,3 +47,8 @@ QString NodeAssociatedToWay::value(const QString &key)
 {
     return values.contains(key) ? values[key] : "x";
 }
+
+long NodeAssociatedToWay::id() const
+{
+    return _id;
+}

@@ -15,6 +15,7 @@ public:
     bool pointInWay(double &x, double &y, double &direction, double &threshold);
     bool pointInWay(double &x, double &y);
 
+    QList<OSMPointPtr> points() const;
 private:
     bool pointInSegment(double &x, double& y, int lastIndex);
     bool isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold);
@@ -28,5 +29,7 @@ private:
     QList<OSMPointPtr> _points;
     long _id;
 };
+
+typedef QSharedPointer<Way> WayPtr;
 
 #endif // WAY_H

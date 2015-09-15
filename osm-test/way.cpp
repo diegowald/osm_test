@@ -63,3 +63,9 @@ bool Way::isDirectionAlignedToSegment(int lastIndex, double &direction, double &
     deltaAngle = fabs(angle - direction + 3.141592654 / 2);
     return deltaAngle <= threshold;
 }
+
+
+QList<OSMPointPtr> Way::points() const
+{
+    return _points;
+}

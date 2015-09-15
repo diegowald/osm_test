@@ -163,5 +163,7 @@ void MainWindow::queryDatabase(double X, double Y)
         //row++;
     }
 
-    ui->forwardFrame->updateScene(X, Y, nodes, intersections);
+    WayPtr way = _signalDetector->getCurrentWay(X, Y, direction);
+    QList<WayPtr> intersectionWays = _signalDetector->getIntersectionWays(intersections);
+    ui->forwardFrame->updateScene(X, Y, way, intersectionWays, nodes, intersections);
 }

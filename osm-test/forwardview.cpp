@@ -1,4 +1,5 @@
 #include "forwardview.h"
+#include <QDebug>
 
 #include <QLayout>
 #ifndef QT_NO_PRINTER
@@ -13,6 +14,7 @@
 #include <qmath.h>
 
 #ifndef QT_NO_WHEELEVENT
+
 void GraphicsView::wheelEvent(QWheelEvent *e)
 {
 /*    if (e->modifiers() & Qt::ControlModifier) {
@@ -48,35 +50,81 @@ QGraphicsView *ForwardView::view() const
     return static_cast<QGraphicsView *>(graphicsView);
 }
 
-void ForwardView::updateScene(double &x, double &y, QList<NodeAssociatedToWayPtr> &nodes, QList<NodeAssociatedToWayPtr> &intersections)
+void ForwardView::updateScene(double &x, double &y,
+                              WayPtr way, QList<WayPtr> intersectionsWays,
+                              QList<NodeAssociatedToWayPtr> &nodes,
+                              QList<NodeAssociatedToWayPtr> &intersections)
 {
-/*    //scene.clear();
-    qreal scale = 0.1; //qPow(qreal(2), (zoomSlider->value() - 250) / qreal(50));
+    scene.clear();
+
+    drawWay(way, true);
+
+    foreach (WayPtr w, intersectionsWays)
+    {
+        drawWay(w, false);
+    }
+
+    QPen pen1(Qt::blue);
+    foreach (NodeAssociatedToWayPtr node, nodes)
+    {
+        qreal x = scale(node->X());
+        qreal y = scale(node->Y());
+        QGraphicsLineItem *item = scene.addLine(0, 0, 1, 1, pen1);
+
+        item->setPos(x, y);
+        qDebug() << "signal " << x << ", " << y;
+        qDebug() << "item rect" << item->boundingRect();
+    }
+
+    QPen pen2(Qt::red);
+    foreach (NodeAssociatedToWayPtr node, intersections)
+    {
+        qreal x = scale(node->X());
+        qreal y = scale(node->Y());
+        QGraphicsLineItem *item = scene.addLine(0, 0, 1, 1, pen2);
+        item->setPos(x, y);
+        qDebug() << "int: " << x << ", " << y;
+        qDebug() << "item rect" << item->boundingRect();
+    }
+
+    graphicsView->fitInView(scene.sceneRect(), Qt::KeepAspectRatio);
+
+    qDebug() << "scene " << scene.sceneRect();
+
+    graphicsView->centerOn(scale(x), scale(y));
+
+    qreal scale = 10.;
 
     QMatrix matrix;
     matrix.scale(scale, scale);
-    matrix.rotate(0);
+    matrix.rotate(45);
 
     graphicsView->setMatrix(matrix);
+}
+
+qreal ForwardView::scale(double coord)
+{
+    return coord * 1.e3;
+}
 
 
-    graphicsView->centerOn(x, y);*/
-    scene.clear();
-    foreach (NodeAssociatedToWayPtr node, nodes)
+void ForwardView::drawWay(WayPtr way, bool mainWay)
+{
+    QPen roadPen(mainWay ? Qt::darkGray : Qt::green);
+    roadPen.setWidthF(mainWay ? 2 : 1);
+    QList<OSMPointPtr> points = way->points();
+    double x0 = scale(points.at(0)->x());
+    double y0 = scale(points.at(0)->y());
+    for (int i = 1; i < points.count(); ++i)
     {
-        QGraphicsTextItem *item = scene.addText(node->value("highway"));
-        item->setPos(node->X(), node->Y());
-        item->font().setPointSizeF(0.001);
-    }
+        double x = scale(points.at(i)->x());
+        double y = scale(points.at(i)->y());
 
-    foreach (NodeAssociatedToWayPtr node, intersections)
-    {
-        QGraphicsTextItem *item = scene.addText(node->value("name"));
-        item->setPos(node->X(), node->Y());
-        item->font().setPointSizeF(0.0001);
+        QGraphicsLineItem *item = scene.addLine(0, 0, x - x0, y - y0, roadPen);
+        qDebug() << "line " << x0 << ", " <<  y0 << ", " << x << ", " << y;
+        item->setPos(x0, y0);
+        x0 = x;
+        y0 = y;
+        qDebug() << "item rect" << item->boundingRect();
     }
-
-/*    graphicsView->fitInView(x - .005, y - 0.005, .01, 0.01);
-    graphicsView->setSceneRect(0,0,graphicsView->frameSize().width(),graphicsView->frameSize().height());*/
-    graphicsView->fitInView(scene.sceneRect(), Qt::KeepAspectRatio);
 }

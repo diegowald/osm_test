@@ -2,7 +2,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariant>
-#include <QDebug>
+//#include <QDebug>
 #include "way.h"
 
 OSMHandler::OSMHandler(const QString &databaseFile, QObject *parent) : QObject(parent)
@@ -48,10 +48,10 @@ QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)
     query.bindValue(":x", x);
     query.bindValue(":y", y);
     query.bindValue(":maxDist", threshold);
-qDebug() << sql;
-qDebug() << ":x" << x;
-qDebug() << ":y"<< y;
-qDebug() << ":maxDist" << threshold;
+//qDebug() << sql;
+//qDebug() << ":x" << x;
+//qDebug() << ":y"<< y;
+//qDebug() << ":maxDist" << threshold;
 
     if (query.exec())
     {
@@ -62,7 +62,7 @@ qDebug() << ":maxDist" << threshold;
     }
     else
     {
-        qDebug() << sql << ": " << query.lastError().text();
+        //qDebug() << sql << ": " << query.lastError().text();
     }
     return results;
 }
@@ -85,7 +85,7 @@ long OSMHandler::wayByNodeId(long nodeId)
     }
     else
     {
-        qDebug() << query.lastError().text();
+        //qDebug() << query.lastError().text();
     }
     return -1;
 }
@@ -133,9 +133,9 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getInfoNodes(long way_id, double &x, d
     }
     else
     {
-        qDebug() << query.lastError().text();
+        //qDebug() << query.lastError().text();
     }
-    qDebug() << way_id << ": " << result.count();
+    //qDebug() << way_id << ": " << result.count();
     return result.values();
 }
 
@@ -181,9 +181,9 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getIntersections(long way_id, double &
     }
     else
     {
-        qDebug() << query.lastError().text();
+        //qDebug() << query.lastError().text();
     }
-    qDebug() << way_id << ": " << result.count();
+    //qDebug() << way_id << ": " << result.count();
     return result.values();
 }
 
@@ -199,8 +199,8 @@ QList<OSMPointPtr> OSMHandler::getWayNodes(long way_id)
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
-    qDebug() << sql;
-    qDebug() << way_id;
+    //qDebug() << sql;
+    //qDebug() << way_id;
     if (query.exec())
     {
         while (query.next())
@@ -216,8 +216,8 @@ QList<OSMPointPtr> OSMHandler::getWayNodes(long way_id)
     }
     else
     {
-        qDebug() << query.lastError().text();
+        //qDebug() << query.lastError().text();
     }
-    qDebug() << way_id << ": " << result.count();
+    //qDebug() << way_id << ": " << result.count();
     return result;
 }

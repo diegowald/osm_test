@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include <QList>
 #include "nodeassociatedtoway.h"
+#include "way.h"
 
 class ForwardView;
 
@@ -31,11 +32,16 @@ public:
     explicit ForwardView(QWidget *parent = 0);
     QGraphicsView *view() const;
 
-    void updateScene(double &x, double &y, QList<NodeAssociatedToWayPtr> &nodes, QList<NodeAssociatedToWayPtr> &intersections);
+    void updateScene(double &x, double &y, WayPtr way, QList<WayPtr> intersectionsWays, QList<NodeAssociatedToWayPtr> &nodes, QList<NodeAssociatedToWayPtr> &intersections);
 
 signals:
 
 public slots:
+
+private:
+    qreal scale(double coord);
+    void drawWay(WayPtr way, bool mainWay);
+
 
 private:
     GraphicsView *graphicsView;
