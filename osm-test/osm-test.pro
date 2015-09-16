@@ -35,3 +35,6 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
+RESOURCES += \
+    signals.qrc
+

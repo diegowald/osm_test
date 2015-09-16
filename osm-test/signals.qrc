@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/signals">
+        <file alias="stop">1_stop.png</file>
+        <file alias="noStraight">2_no straight.png</file>
+        <file alias="noParking">3_noparking.png</file>
+        <file alias="noPassing">4_no passing.png</file>
+        <file alias="Limit30">5_speed limit 30.png</file>
+    </qresource>
+</RCC>

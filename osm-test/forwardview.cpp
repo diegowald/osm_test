@@ -69,9 +69,16 @@ void ForwardView::updateScene(double &x, double &y,
     {
         qreal x = scale(node->X());
         qreal y = scale(node->Y());
-        QGraphicsLineItem *item = scene.addLine(0, 0, 1, 1, pen1);
+        //QGraphicsLineItem *item = scene.addLine(0, 0, 1, 1, pen1);
 
+        QGraphicsPixmapItem * item = scene.addPixmap(pixmap(node));
         item->setPos(x, y);
+        QMatrix matrix;
+        matrix.scale(.005, .0050);
+        matrix.rotate(0);
+        item->setMatrix(matrix);
+        item->setPos(x, y);
+
         qDebug() << "signal " << x << ", " << y;
         qDebug() << "item rect" << item->boundingRect();
     }
@@ -81,7 +88,13 @@ void ForwardView::updateScene(double &x, double &y,
     {
         qreal x = scale(node->X());
         qreal y = scale(node->Y());
-        QGraphicsLineItem *item = scene.addLine(0, 0, 1, 1, pen2);
+        QGraphicsPixmapItem *item = scene.addPixmap(QPixmap(":/signals/stop"));
+        qDebug() << item->boundingRect();
+        //QGraphicsLineItem *item = scene.addLine(0, 0, .1, .1, pen2);
+        QMatrix matrix;
+        matrix.scale(.005, .0050);
+        matrix.rotate(0);
+        item->setMatrix(matrix);
         item->setPos(x, y);
         qDebug() << "int: " << x << ", " << y;
         qDebug() << "item rect" << item->boundingRect();
@@ -127,4 +140,23 @@ void ForwardView::drawWay(WayPtr way, bool mainWay)
         y0 = y;
         qDebug() << "item rect" << item->boundingRect();
     }
+}
+
+QPixmap ForwardView::pixmap(NodeAssociatedToWayPtr node)
+{
+    QString signalType = node->value("highway");
+
+    if (signalType == "traffic_signals")
+    {
+        return QPixmap(":/signals/stop");
+    }
+    else
+    {
+        return QPixmap(":/signals/noParking");
+    }
+/*    turning_circle
+    bus_stop
+    speed_camera
+    street_lamp
+*/
 }

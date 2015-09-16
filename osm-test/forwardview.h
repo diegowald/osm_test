@@ -41,7 +41,7 @@ public slots:
 private:
     qreal scale(double coord);
     void drawWay(WayPtr way, bool mainWay);
-
+    QPixmap pixmap(NodeAssociatedToWayPtr node);
 
 private:
     GraphicsView *graphicsView;
