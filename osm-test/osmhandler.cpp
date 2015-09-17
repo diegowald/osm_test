@@ -40,14 +40,16 @@ QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)
             " inner join osm_way_refs on osm_nodes.node_id = osm_way_refs.node_id "
             " inner join osm_way_tags on osm_way_refs.way_id = osm_way_tags.way_id "
             " and osm_way_tags.k = 'highway' "
-            " where abs(x - :x) + abs(y- :y) < :maxDist; ";
+            " where x between :x1 and :x2 "
+            " and   y between :y1 and :y2;";
 
 
     QSqlQuery query;
     query.prepare(sql);
-    query.bindValue(":x", x);
-    query.bindValue(":y", y);
-    query.bindValue(":maxDist", threshold);
+    query.bindValue(":x1", x - threshold / 2);
+    query.bindValue(":x2", x + threshold / 2);
+    query.bindValue(":y1", y - threshold / 2);
+    query.bindValue(":y2", y + threshold / 2);
 //qDebug() << sql;
 //qDebug() << ":x" << x;
 //qDebug() << ":y"<< y;
@@ -100,16 +102,18 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getInfoNodes(long way_id, double &x, d
             " osm_node_tags on osm_nodes.node_id = osm_node_tags.node_id "
             " inner join osm_way_refs on osm_nodes.node_id = osm_way_refs.node_id "
             " where osm_way_refs.way_id = :way_id "
-            " and abs(x - :x) + abs(y- :y) < :maxDist;";
+            " and x between :x1 and :x2 "
+            " and y between :y1 and :y2;";
 
     //node_id|x|y|k|v
 
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
-    query.bindValue(":x", x);
-    query.bindValue(":y", y);
-    query.bindValue(":maxDist", maxDistance);
+    query.bindValue(":x1", x - maxDistance / 2);
+    query.bindValue(":x2", x + maxDistance / 2);
+    query.bindValue(":y1", y - maxDistance / 2);
+    query.bindValue(":y2", y + maxDistance / 2);
 
     if (query.exec())
     {
@@ -151,14 +155,16 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getIntersections(long way_id, double &
             " currentway.node_id = intersections.node_id "
             " inner join osm_way_tags on osm_way_tags.way_id = intersections.way_id "
             " where currentway.way_id = :way_id and intersections.way_id != :way_id "
-            " and abs(x - :x) + abs(y- :y) < :maxDist;";
+            " and x between :x1 and :x2 "
+            " and y between :y1 and :y2;";
 
     QSqlQuery query;
     query.prepare(sql);
     query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
-    query.bindValue(":x", x);
-    query.bindValue(":y", y);
-    query.bindValue(":maxDist", maxDistance);
+    query.bindValue(":x1", x - maxDistance / 2);
+    query.bindValue(":x2", x + maxDistance / 2);
+    query.bindValue(":y1", y - maxDistance / 2);
+    query.bindValue(":y2", y + maxDistance / 2);
     if (query.exec())
     {
         while (query.next())

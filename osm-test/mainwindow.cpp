@@ -59,10 +59,15 @@ MainWindow::~MainWindow()
 void MainWindow::on_btnSetup_released()
 {
     // Since it's a dummy test. Let's hardcode this part.
-    minX = -62.3155083;
+    /*minX = -62.3155083;
     minY = -38.7235012;
     maxX = -62.2728802;
-    maxY = -38.6909236;
+    maxY = -38.6909236;*/
+    minX = 127.3666;
+    minY = 36.2998;
+    maxX = 127.3666;
+    maxY = 36.3426;
+
     elapsedTime = 0.;
     refreshData();
 }
