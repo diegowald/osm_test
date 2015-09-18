@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     osmpoint.cpp \
     vector2d.cpp \
     forwardview.cpp \
-    forwardviewwidget.cpp
+    forwardviewwidget.cpp \
+    mapviewwidget.cpp \
+    mapcache.cpp
 
 HEADERS  += mainwindow.h \
     nodeassociatedtoway.h \
@@ -33,7 +35,9 @@ HEADERS  += mainwindow.h \
     osmpoint.h \
     vector2d.h \
     forwardview.h \
-    forwardviewwidget.h
+    forwardviewwidget.h \
+    mapviewwidget.h \
+    mapcache.h
 
 FORMS    += mainwindow.ui
 

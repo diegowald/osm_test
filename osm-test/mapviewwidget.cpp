@@ -1,8 +1,7 @@
-#include "forwardviewwidget.h"
+#include "mapviewwidget.h"
 #include <QPaintEvent>
 #include <QPainter>
-
-ForwardViewWidget::ForwardViewWidget(QWidget *parent) : QWidget(parent)
+MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
 {
     _maxDistance = 1;
 
@@ -12,7 +11,7 @@ ForwardViewWidget::ForwardViewWidget(QWidget *parent) : QWidget(parent)
     _rotation = 0;
 }
 
-void ForwardViewWidget::paintEvent(QPaintEvent *evt)
+void MapViewWidget::paintEvent(QPaintEvent *evt)
 {
     QPainter painter(this);
     QRect geo = this->geometry();
@@ -32,45 +31,30 @@ void ForwardViewWidget::paintEvent(QPaintEvent *evt)
                 transformToWidgetCoords(QPointF(0,0)),
                 transformToWidgetCoords(QPointF(0.5, 0.3)));
 */
-    drawWay(painter, _currentWay, QColor(Qt::red));
-
     foreach (WayPtr w, _ways)
     {
         drawWay(painter, w, QColor(Qt::darkGray));
     }
-
-    foreach (NodeAssociatedToWayPtr node, _nodes) {
-        drawSignal(painter, node);
-    }
-
-    foreach (NodeAssociatedToWayPtr node, _intersectionNodes)
-    {
-        drawSignal(painter, node);
-    }
-
-    painter.drawText(geo.width() / 2, geo.height() - 20, QString::number(_rotation));
-    painter.drawText(geo.width() / 2, geo.height() - 10, QString::number(_vehicleDirection));
-
 }
 
-void ForwardViewWidget::setMaxDistance(double distance)
+void MapViewWidget::setMaxDistance(double distance)
 {
     _maxDistance = distance;
 }
 
-double ForwardViewWidget::scale()
+double MapViewWidget::scale()
 {
     return (geometry().height() * 1.0) / _maxDistance;
 }
 
 
-void ForwardViewWidget::setVehicleCoordinates(double X, double Y)
+void MapViewWidget::setVehicleCoordinates(double X, double Y)
 {
     _carX = X;
     _carY = Y;
 }
 
-QPointF ForwardViewWidget::transformToWidgetCoords(QPointF realPoint)
+QPointF MapViewWidget::transformToWidgetCoords(QPointF realPoint)
 {
     double xR1 = realPoint.x() - _carX;
     double yR1 = realPoint.y() - _carY;
@@ -81,11 +65,11 @@ QPointF ForwardViewWidget::transformToWidgetCoords(QPointF realPoint)
     double x0 = rotatedX * scale();
     double y0 = rotatedY * scale();
 
-    return QPointF(x0 + geometry().width() / 2., geometry().height() - y0);
+    return QPointF(x0 + geometry().width() / 2., geometry().height() / 2 - y0);
 }
 
 
-void ForwardViewWidget::drawSignal(QPainter &painter, NodeAssociatedToWayPtr node)
+void MapViewWidget::drawSignal(QPainter &painter, NodeAssociatedToWayPtr node)
 {
     QPointF pt = transformToWidgetCoords(QPointF(node->X(), node->Y()));
     QPixmap pix = pixmap(node);
@@ -94,7 +78,7 @@ void ForwardViewWidget::drawSignal(QPainter &painter, NodeAssociatedToWayPtr nod
     painter.drawPixmap(pt, pix);
 }
 
-void ForwardViewWidget::drawWay(QPainter &painter, WayPtr way, QColor color)
+void MapViewWidget::drawWay(QPainter &painter, WayPtr way, QColor color)
 {
     if (way.isNull())
         return;
@@ -106,43 +90,32 @@ void ForwardViewWidget::drawWay(QPainter &painter, WayPtr way, QColor color)
     {
         p = way->points().at(i);
         QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
-        painter.setPen(color);
+        QPen pen(color);
+        pen.setWidth(2);
+        painter.setPen(pen);
         painter.drawLine(pt0, pt1);
         pt0 = pt1;
     }
 }
 
-void ForwardViewWidget::setCurrentWay(WayPtr way)
-{
-    _currentWay = way;
-}
 
-void ForwardViewWidget::setIntersectionWays(QList<WayPtr> &ways)
+
+void MapViewWidget::setWays(QList<WayPtr> &ways)
 {
     _ways = ways;
 }
 
-void ForwardViewWidget::setRotation(double alpha)
+void MapViewWidget::setRotation(double alpha)
 {
     _rotation  = alpha;
 }
 
-void ForwardViewWidget::setIntersectionNodes(QList<NodeAssociatedToWayPtr> &nodes)
-{
-    _intersectionNodes = nodes;
-}
-
-void ForwardViewWidget::setSignals(QList<NodeAssociatedToWayPtr> &nodes)
-{
-    _nodes = nodes;
-}
-
-void ForwardViewWidget::setVehicleDirection(double direction)
+void MapViewWidget::setVehicleDirection(double direction)
 {
     _vehicleDirection = direction;
 }
 
-QPixmap ForwardViewWidget::pixmap(NodeAssociatedToWayPtr node)
+QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
 {
     QString signalType = node->value("highway");
     QPixmap pix;

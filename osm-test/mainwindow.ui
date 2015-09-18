@@ -172,7 +172,27 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
+       <widget class="MapViewWidget" name="mapWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>300</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="ForwardViewWidget" name="forwardViewWidget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>300</height>
+           </size>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QTableWidget" name="nodeInformation">
           <column>
@@ -213,32 +233,6 @@
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="ForwardViewWidget" name="forwardViewWidget" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="ForwardView" name="forwardFrame">
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
    </layout>
@@ -266,15 +260,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>ForwardView</class>
-   <extends>QFrame</extends>
-   <header location="global">forwardview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ForwardViewWidget</class>
    <extends>QWidget</extends>
    <header location="global">forwardviewwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MapViewWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">mapviewwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

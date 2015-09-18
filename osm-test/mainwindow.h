@@ -7,6 +7,7 @@
 #include "osmhandler.h"
 #include "waysignaldetector.h"
 #include "forwardview.h"
+#include "mapcache.h"
 
 namespace Ui {
 class MainWindow;
@@ -49,9 +50,7 @@ private:
     QTimer *timer;
     OSMHandlerPtr _osmHandler;
     WaySignalDetectorPtr _signalDetector;
-
-    QGraphicsScene *forwardSignalsSchene;
-
+    MapCachePtr _mapCache;
 };
 
 #endif // MAINWINDOW_H

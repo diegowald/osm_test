@@ -25,6 +25,7 @@ public:
 
     QList<OSMPointPtr> getWayNodes(long way_id);
 
+
 signals:
 
 public slots:

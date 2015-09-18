@@ -1,30 +1,23 @@
-#ifndef FORWARDVIEWWIDGET_H
-#define FORWARDVIEWWIDGET_H
+#ifndef MAPVIEWWIDGET_H
+#define MAPVIEWWIDGET_H
 
 #include <QWidget>
 #include "way.h"
-#include "nodeassociatedtoway.h"
 
-class ForwardViewWidget : public QWidget
+class MapViewWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ForwardViewWidget(QWidget *parent = 0);
-
+    explicit MapViewWidget(QWidget *parent = 0);
     virtual void paintEvent(QPaintEvent *evt);
 
     void setMaxDistance(double distance);
 
     void setVehicleCoordinates(double X, double Y);
-
-    void setCurrentWay(WayPtr way);
-    void setIntersectionWays(QList<WayPtr> &ways);
-
-    void setSignals(QList<NodeAssociatedToWayPtr> &nodes);
-    void setIntersectionNodes(QList<NodeAssociatedToWayPtr> &nodes);
-    void setRotation(double alpha);
     void setVehicleDirection(double direction);
 
+    void setWays(QList<WayPtr> &ways);
+    void setRotation(double alpha);
 
 signals:
 
@@ -42,14 +35,9 @@ private:
     double _carX;
     double _carY;
 
-    WayPtr _currentWay;
     QList<WayPtr> _ways;
-    double _rotation;
     double _vehicleDirection;
-
-    QList<NodeAssociatedToWayPtr> _nodes;
-    QList<NodeAssociatedToWayPtr> _intersectionNodes;
-
+    double _rotation;
 };
 
-#endif // FORWARDVIEWWIDGET_H
+#endif // MAPVIEWWIDGET_H
