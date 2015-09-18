@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     way.cpp \
     osmpoint.cpp \
     vector2d.cpp \
-    forwardview.cpp
+    forwardview.cpp \
+    forwardviewwidget.cpp
 
 HEADERS  += mainwindow.h \
     nodeassociatedtoway.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     way.h \
     osmpoint.h \
     vector2d.h \
-    forwardview.h
+    forwardview.h \
+    forwardviewwidget.h
 
 FORMS    += mainwindow.ui
 

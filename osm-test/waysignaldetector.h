@@ -21,6 +21,8 @@ public:
     WayPtr getCurrentWay(double &x, double &y, double &direction);
     QList<WayPtr> getIntersectionWays(QList<NodeAssociatedToWayPtr> intersections);
 
+    double getMaxDistance();
+
 
 private:
     double meters2Degrees(double &meters);

@@ -50,14 +50,15 @@ QGraphicsView *ForwardView::view() const
     return static_cast<QGraphicsView *>(graphicsView);
 }
 
-void ForwardView::updateScene(double &x, double &y,
-                              WayPtr way, QList<WayPtr> intersectionsWays,
+void ForwardView::updateScene(double &x, double &y, double &maxDistance,
+                              WayPtr way, double &orientation,
+                              QList<WayPtr> intersectionsWays,
                               QList<NodeAssociatedToWayPtr> &nodes,
                               QList<NodeAssociatedToWayPtr> &intersections)
 {
-    scene.clear();
+    //scene.clear();
 
-    drawWay(way, true);
+    QGraphicsItem *wayItem = drawWay(way, true);
 
     foreach (WayPtr w, intersectionsWays)
     {
@@ -74,8 +75,8 @@ void ForwardView::updateScene(double &x, double &y,
         QGraphicsPixmapItem * item = scene.addPixmap(pixmap(node));
         item->setPos(x, y);
         QMatrix matrix;
-        matrix.scale(.005, .0050);
-        matrix.rotate(0);
+        matrix.scale(.002, .0020);
+        matrix.rotate(180);
         item->setMatrix(matrix);
         item->setPos(x, y);
 
@@ -86,33 +87,40 @@ void ForwardView::updateScene(double &x, double &y,
     QPen pen2(Qt::red);
     foreach (NodeAssociatedToWayPtr node, intersections)
     {
-        qreal x = scale(node->X());
+        /*qreal x = scale(node->X());
         qreal y = scale(node->Y());
         QGraphicsPixmapItem *item = scene.addPixmap(QPixmap(":/signals/stop"));
         qDebug() << item->boundingRect();
         //QGraphicsLineItem *item = scene.addLine(0, 0, .1, .1, pen2);
         QMatrix matrix;
-        matrix.scale(.005, .0050);
-        matrix.rotate(0);
+        matrix.scale(.002, .0020);
+        matrix.rotate(180);
         item->setMatrix(matrix);
         item->setPos(x, y);
         qDebug() << "int: " << x << ", " << y;
-        qDebug() << "item rect" << item->boundingRect();
+        qDebug() << "item rect" << item->boundingRect();*/
     }
 
     graphicsView->fitInView(scene.sceneRect(), Qt::KeepAspectRatio);
 
     qDebug() << "scene " << scene.sceneRect();
 
-    graphicsView->centerOn(scale(x), scale(y));
 
-    qreal scale = 10.;
+    qreal s = 50.;
 
     QMatrix matrix;
-    matrix.scale(scale, scale);
-    matrix.rotate(45);
+    matrix.scale(s, s);
+    double angle = orientation * 180. / 3.141592654 + 180.;
+    qDebug() << angle;
+    matrix.rotate(-angle);
 
     graphicsView->setMatrix(matrix);
+    //graphicsView->centerOn(scale(x), scale(y));
+    graphicsView->ensureVisible(QRectF(scale(x - maxDistance / 2.), scale(y + maxDistance), maxDistance, maxDistance));
+
+    QGraphicsTextItem *i = scene.addText("x");
+    i->setScale(.1);
+    i->setPos(scale(x), scale(y));
 }
 
 qreal ForwardView::scale(double coord)
@@ -121,25 +129,31 @@ qreal ForwardView::scale(double coord)
 }
 
 
-void ForwardView::drawWay(WayPtr way, bool mainWay)
+QGraphicsLineItem *ForwardView::drawWay(WayPtr way, bool mainWay)
 {
-    QPen roadPen(mainWay ? Qt::darkGray : Qt::green);
-    roadPen.setWidthF(mainWay ? 2 : 1);
-    QList<OSMPointPtr> points = way->points();
-    double x0 = scale(points.at(0)->x());
-    double y0 = scale(points.at(0)->y());
-    for (int i = 1; i < points.count(); ++i)
+    QGraphicsLineItem *item = NULL;
+    if (!way.isNull() && way->points().count() > 0)
     {
-        double x = scale(points.at(i)->x());
-        double y = scale(points.at(i)->y());
+        QPen roadPen(mainWay ? Qt::darkGray : Qt::green);
+        roadPen.setWidthF(mainWay ? .2 : .1);
+        QList<OSMPointPtr> points = way->points();
+        double x0 = scale(points.at(0)->x());
+        double y0 = scale(points.at(0)->y());
 
-        QGraphicsLineItem *item = scene.addLine(0, 0, x - x0, y - y0, roadPen);
-        qDebug() << "line " << x0 << ", " <<  y0 << ", " << x << ", " << y;
-        item->setPos(x0, y0);
-        x0 = x;
-        y0 = y;
-        qDebug() << "item rect" << item->boundingRect();
+        for (int i = 1; i < points.count(); ++i)
+        {
+            double x = scale(points.at(i)->x());
+            double y = scale(points.at(i)->y());
+
+            item = scene.addLine(0, 0, x - x0, y - y0, roadPen);
+            qDebug() << "line " << x0 << ", " <<  y0 << ", " << x << ", " << y;
+            item->setPos(x0, y0);
+            x0 = x;
+            y0 = y;
+            qDebug() << "item rect" << item->boundingRect();
+        }
     }
+    return item;
 }
 
 QPixmap ForwardView::pixmap(NodeAssociatedToWayPtr node)

@@ -41,6 +41,8 @@ private:
     double maxY;
     double currentX;
     double currentY;
+    double prevX;
+    double prevY;
     double elapsedTime;
     bool playing;
 
@@ -49,6 +51,7 @@ private:
     WaySignalDetectorPtr _signalDetector;
 
     QGraphicsScene *forwardSignalsSchene;
+
 };
 
 #endif // MAINWINDOW_H

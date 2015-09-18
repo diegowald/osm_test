@@ -21,10 +21,11 @@ long OSMHandler::nearestWay(double &x, double &y, double &direction, double &thr
 {
     QList<long> candidates = nearestWays(x, y, threshold);
 
+    double angleThreshold = 45. / 180. * 3.141592654;
     foreach (long way_id, candidates)
     {
         Way way(this, way_id);
-        if (way.pointInWay(x, y))
+        if (way.pointInWay(x, y, direction, angleThreshold))
             return way_id;
     }
     return -1;

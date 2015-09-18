@@ -214,6 +214,16 @@
        </layout>
       </item>
       <item>
+       <widget class="ForwardViewWidget" name="forwardViewWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="ForwardView" name="forwardFrame">
         <property name="minimumSize">
          <size>
@@ -259,6 +269,12 @@
    <class>ForwardView</class>
    <extends>QFrame</extends>
    <header location="global">forwardview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ForwardViewWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">forwardviewwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

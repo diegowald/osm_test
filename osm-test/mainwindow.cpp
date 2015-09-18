@@ -18,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :
     elapsedTime = 0.;
     currentX = minX;
     currentY = minY;
+    prevX = minX;
+    prevY = minY;
+
     playing = false;
     refreshData();
     timer = new QTimer(this);
@@ -103,6 +106,8 @@ void MainWindow::on_btnPlayStop_released()
 
 void MainWindow::on_moveLocation()
 {
+    prevX = currentX;
+    prevY = currentY;
     double delta = (maxY - minY) / 100;
     qDebug() << delta;
     currentY+= delta;
@@ -129,7 +134,15 @@ void MainWindow::gatherCurrentPositionData(double X, double Y)
 
 void MainWindow::queryDatabase(double X, double Y)
 {
-    double direction = -1.;
+    double direction = 0;
+    double deltaX = currentX - prevX;
+    double deltaY = currentY - prevY;
+    double signX = deltaX < 0 ? -1. : 1.;
+    double signY = deltaY < 0 ? -1. : 1.;
+    direction = abs(deltaX) < 0.001
+            ? signY * 3.141592654 / 2
+            : atan(deltaY / deltaX);
+
     QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction);
     ui->nodeInformation->setRowCount(0);
 
@@ -169,6 +182,20 @@ void MainWindow::queryDatabase(double X, double Y)
     }
 
     WayPtr way = _signalDetector->getCurrentWay(X, Y, direction);
+    double orientation = way->getOrientation(X, Y, direction);
     QList<WayPtr> intersectionWays = _signalDetector->getIntersectionWays(intersections);
-    ui->forwardFrame->updateScene(X, Y, way, intersectionWays, nodes, intersections);
+    double maxDist = _signalDetector->getMaxDistance();
+    ui->forwardFrame->updateScene(X, Y, maxDist,
+                                  way, orientation, intersectionWays,
+                                  nodes, intersections);
+
+    ui->forwardViewWidget->setMaxDistance(maxDist);
+    ui->forwardViewWidget->setVehicleCoordinates(X, Y);
+    ui->forwardViewWidget->setCurrentWay(way);
+    ui->forwardViewWidget->setIntersectionWays(intersectionWays);
+    ui->forwardViewWidget->setSignals(nodes);
+    ui->forwardViewWidget->setIntersectionNodes(intersections);
+    ui->forwardViewWidget->setRotation(orientation);
+    ui->forwardViewWidget->setVehicleDirection(direction);
+    ui->forwardViewWidget->repaint();
 }

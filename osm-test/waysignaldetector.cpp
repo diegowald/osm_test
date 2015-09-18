@@ -12,8 +12,14 @@ WaySignalDetector::WaySignalDetector(OSMHandlerPtr osmHandler, QObject *parent) 
     qDebug() << degrees2meters(maxDistance);
 }
 
+
 WaySignalDetector::~WaySignalDetector()
 {
+}
+
+double WaySignalDetector::getMaxDistance()
+{
+    return maxDistance;
 }
 
 QList<NodeAssociatedToWayPtr> WaySignalDetector::getUpcommingSignals(double &x, double &y, double &direction)

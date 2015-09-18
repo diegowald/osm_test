@@ -32,7 +32,7 @@ public:
     explicit ForwardView(QWidget *parent = 0);
     QGraphicsView *view() const;
 
-    void updateScene(double &x, double &y, WayPtr way, QList<WayPtr> intersectionsWays, QList<NodeAssociatedToWayPtr> &nodes, QList<NodeAssociatedToWayPtr> &intersections);
+    void updateScene(double &x, double &y, double &maxDistance, WayPtr way, double &orientation, QList<WayPtr> intersectionsWays, QList<NodeAssociatedToWayPtr> &nodes, QList<NodeAssociatedToWayPtr> &intersections);
 
 signals:
 
@@ -40,7 +40,7 @@ public slots:
 
 private:
     qreal scale(double coord);
-    void drawWay(WayPtr way, bool mainWay);
+    QGraphicsLineItem *drawWay(WayPtr way, bool mainWay);
     QPixmap pixmap(NodeAssociatedToWayPtr node);
 
 private:

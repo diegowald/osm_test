@@ -53,10 +53,7 @@ bool Way::pointInSegment(double &x, double &y, int lastIndex)
 
 bool Way::isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold)
 {
-    OSMPointPtr pt1 = _points.at(lastIndex - 1);
-    OSMPointPtr pt2 = _points.at(lastIndex);
-    Vector2D v(pt1->x(), pt1->y(), pt2->x(), pt2->y());
-    double angle = v.angle();
+    double angle = segmentOrientation(lastIndex);
     double deltaAngle = fabs(angle - direction);
     if (deltaAngle <= threshold)
         return true;
@@ -68,4 +65,23 @@ bool Way::isDirectionAlignedToSegment(int lastIndex, double &direction, double &
 QList<OSMPointPtr> Way::points() const
 {
     return _points;
+}
+
+double Way::segmentOrientation(int lastIndex)
+{
+    OSMPointPtr pt1 = _points.at(lastIndex - 1);
+    OSMPointPtr pt2 = _points.at(lastIndex);
+    Vector2D v(pt1->x(), pt1->y(), pt2->x(), pt2->y());
+    return v.angle();
+}
+
+double Way::getOrientation(double &x, double &y, double &direction)
+{
+    for (int i = 1; i < _points.count(); ++i)
+    {
+        if (pointInSegment(x, y, i))
+        {
+            return segmentOrientation(i);
+        }
+    }
 }

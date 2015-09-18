@@ -16,10 +16,12 @@ public:
     bool pointInWay(double &x, double &y);
 
     QList<OSMPointPtr> points() const;
+
+    double getOrientation(double &x, double &y, double &direction);
 private:
     bool pointInSegment(double &x, double& y, int lastIndex);
     bool isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold);
-
+    double segmentOrientation(int lastIndex);
 signals:
 
 public slots:
