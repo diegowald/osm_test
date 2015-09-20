@@ -108,6 +108,55 @@ QList<long> OSMHandler::features(double &x, double &y, double &maxDistance)
     return results;
 }
 
+QList<NodeAssociatedToWayPtr> OSMHandler::getPointFeatures(double &x, double &y,  double &maxDistance)
+{
+    QMap<long, NodeAssociatedToWayPtr> result;
+
+    QString sql =
+            " select osm_nodes.node_id, x, y, k, v "
+            " from osm_nodes inner join "
+            " osm_node_tags on osm_nodes.node_id = osm_node_tags.node_id "
+            " where  "
+            " x between :x1 and :x2 "
+            " and y between :y1 and :y2;";
+
+    //node_id|x|y|k|v
+
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":x1", x - maxDistance / 2);
+    query.bindValue(":x2", x + maxDistance / 2);
+    query.bindValue(":y1", y - maxDistance / 2);
+    query.bindValue(":y2", y + maxDistance / 2);
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            long node_id = query.value(0).toLongLong();
+            double x = query.value(1).toDouble();
+            double y = query.value(2).toDouble();
+            QString key = query.value(3).toString();
+            QString value = query.value(4).toString();
+
+            if (!result.contains(node_id))
+            {
+                NodeAssociatedToWayPtr node = NodeAssociatedToWayPtr::create();
+                node->setCoords(x, y);
+                node->setId(node_id);
+                result[node_id] = node;
+            }
+            result[node_id]->addKeyValue(key, value);
+        }
+    }
+    else
+    {
+        //qDebug() << query.lastError().text();
+    }
+    //qDebug() << way_id << ": " << result.count();
+    return result.values();
+}
+
 
 long OSMHandler::wayByNodeId(long nodeId)
 {

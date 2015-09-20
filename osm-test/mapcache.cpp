@@ -41,6 +41,5 @@ QList<WayPtr> MapCache::getLinearFeatures(double X, double Y, double maxDistance
 
 QList<NodeAssociatedToWayPtr> MapCache::getPointFeatures(double X, double Y, double maxDistance)
 {
-    QList<NodeAssociatedToWayPtr> result;
-    return result;
+    return _handler->getPointFeatures(X, Y, maxDistance);
 }

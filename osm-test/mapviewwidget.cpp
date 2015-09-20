@@ -50,12 +50,16 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
         drawWay(painter, w, QColor(Qt::darkGray));
     }
 
+    foreach (NodeAssociatedToWayPtr node, _pointFeatures)
+    {
+        drawSignal(painter, node);
+    }
+
     QPixmap pix(":/signals/car");
     QPointF pt;
     pt.setX((width() - pix.width())/2);
     pt.setY((height() - pix.height())/2);
     painter.drawPixmap(pt, pix);
-
 }
 
 void MapViewWidget::setMaxDistance(double distance)
