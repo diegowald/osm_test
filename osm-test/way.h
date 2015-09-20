@@ -4,9 +4,9 @@
 #include <QObject>
 #include "osmhandler.h"
 #include "osmpoint.h"
+#include "feature.h"
 
-
-class Way : public QObject
+class Way : public Feature
 {
     Q_OBJECT
 public:

@@ -1,6 +1,9 @@
 #include "mapviewwidget.h"
 #include <QPaintEvent>
 #include <QPainter>
+#include <QDebug>
+
+
 MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
 {
     _maxDistance = 1;
@@ -31,10 +34,28 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
                 transformToWidgetCoords(QPointF(0,0)),
                 transformToWidgetCoords(QPointF(0.5, 0.3)));
 */
+
+    foreach (WayPtr w, _waterWays)
+    {
+        drawWay(painter, w, QColor(Qt::blue));
+    }
+
+    foreach (WayPtr w, _highways)
+    {
+        drawWay(painter, w, QColor(Qt::darkGray));
+    }
+
     foreach (WayPtr w, _ways)
     {
         drawWay(painter, w, QColor(Qt::darkGray));
     }
+
+    QPixmap pix(":/signals/car");
+    QPointF pt;
+    pt.setX((width() - pix.width())/2);
+    pt.setY((height() - pix.height())/2);
+    painter.drawPixmap(pt, pix);
+
 }
 
 void MapViewWidget::setMaxDistance(double distance)
@@ -133,4 +154,42 @@ QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
     street_lamp
 */
     return pix.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
+
+void MapViewWidget::setLinearFeatures(QList<WayPtr> &features)
+{
+    _linearFeatures = features;
+    classifyFeatures();
+}
+
+void MapViewWidget::setPointFeatures(QList<NodeAssociatedToWayPtr> &pts)
+{
+    _pointFeatures = pts;
+    classifyPoints();
+}
+
+
+void MapViewWidget::classifyFeatures()
+{
+    _highways.clear();
+    _waterWays.clear();
+    foreach (WayPtr way, _linearFeatures)
+    {
+        if (way->value("highway").length() > 0)
+        {
+            _highways.append(way);
+        }
+        else if (way->value("waterway").length() > 0)
+        {
+            _waterWays.append(way);
+        }
+        else
+        {
+            qDebug() << way->toString();
+        }
+    }
+}
+
+void MapViewWidget::classifyPoints()
+{
 }

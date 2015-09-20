@@ -2,11 +2,16 @@
 #include "vector2d.h"
 
 
-Way::Way(OSMHandler *osmHandler, long way_id, QObject *parent) : QObject(parent)
+Way::Way(OSMHandler *osmHandler, long way_id, QObject *parent) : Feature(parent)
 {
     _handler = osmHandler;
-    _id = way_id;
+    setId(way_id);
     _points = _handler->getWayNodes(way_id);
+    QMap<QString, QString> values = _handler->getAssociatedInformation(way_id);
+    foreach (QString k, values.keys())
+    {
+        addKeyValue(k, values[k]);
+    }
 }
 
 

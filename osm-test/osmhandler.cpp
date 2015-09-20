@@ -70,6 +70,45 @@ QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)
     return results;
 }
 
+
+QList<long> OSMHandler::features(double &x, double &y, double &maxDistance)
+{
+    QList<long> results;
+
+    QString sql =
+            "select osm_way_refs.way_id "
+            " from osm_nodes "
+            " inner join osm_way_refs on osm_nodes.node_id = osm_way_refs.node_id "
+            " where x between :x1 and :x2 "
+            " and   y between :y1 and :y2;";
+
+
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":x1", x - maxDistance / 2);
+    query.bindValue(":x2", x + maxDistance / 2);
+    query.bindValue(":y1", y - maxDistance / 2);
+    query.bindValue(":y2", y + maxDistance / 2);
+//qDebug() << sql;
+//qDebug() << ":x" << x;
+//qDebug() << ":y"<< y;
+//qDebug() << ":maxDist" << threshold;
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            results.append(query.value(0).toLongLong());
+        }
+    }
+    else
+    {
+        //qDebug() << sql << ": " << query.lastError().text();
+    }
+    return results;
+}
+
+
 long OSMHandler::wayByNodeId(long nodeId)
 {
     QString sql =
@@ -192,6 +231,36 @@ QList<NodeAssociatedToWayPtr> OSMHandler::getIntersections(long way_id, double &
     }
     //qDebug() << way_id << ": " << result.count();
     return result.values();
+}
+
+QMap<QString, QString> OSMHandler::getAssociatedInformation(long way_id)
+{
+    QMap<QString, QString> result;
+
+    QString sql =
+            " select k, v  "
+            " from osm_way_tags "
+            " where way_id = :way_id;";
+
+    QSqlQuery query;
+    query.prepare(sql);
+    query.bindValue(":way_id", QVariant::fromValue<long>(way_id));
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            QString key = query.value(0).toString();
+            QString value = query.value(1).toString();
+
+            result[key] = value;
+        }
+    }
+    else
+    {
+        //qDebug() << query.lastError().text();
+    }
+    //qDebug() << way_id << ": " << result.count();
+    return result;
 }
 
 QList<OSMPointPtr> OSMHandler::getWayNodes(long way_id)

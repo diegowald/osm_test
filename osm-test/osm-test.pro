@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     forwardview.cpp \
     forwardviewwidget.cpp \
     mapviewwidget.cpp \
-    mapcache.cpp
+    mapcache.cpp \
+    feature.cpp
 
 HEADERS  += mainwindow.h \
     nodeassociatedtoway.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
     forwardview.h \
     forwardviewwidget.h \
     mapviewwidget.h \
-    mapcache.h
+    mapcache.h \
+    feature.h
 
 FORMS    += mainwindow.ui
 

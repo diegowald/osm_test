@@ -25,6 +25,9 @@ public:
 
     QList<OSMPointPtr> getWayNodes(long way_id);
 
+    QList<long> features(double &x, double &y, double &maxDistance);
+
+    QMap<QString, QString> getAssociatedInformation(long way_id);
 
 signals:
 
