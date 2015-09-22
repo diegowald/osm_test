@@ -57,8 +57,14 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
 
     QPixmap pix(":/signals/car");
     QPointF pt;
-    pt.setX((width() - pix.width())/2);
-    pt.setY((height() - pix.height())/2);
+//    pt.setX((width() - pix.width())/2);
+//    pt.setY((height() - pix.height())/2);
+
+    pt.setX(_carX);
+    pt.setY(_carY);
+    pt = transformToWidgetCoords(pt);
+    pt.setX(pt.x() - pix.width() / 2);
+    pt.setY(pt.y() - pix.height() / 2);
     painter.drawPixmap(pt, pix);
 }
 
@@ -84,8 +90,8 @@ QPointF MapViewWidget::transformToWidgetCoords(QPointF realPoint)
     double xR1 = realPoint.x() - _carX;
     double yR1 = realPoint.y() - _carY;
 
-    double rotatedX = cos(-_rotation) * xR1 - sin(-_rotation) * yR1;
-    double rotatedY = sin(-_rotation) * xR1 + cos(-_rotation) * yR1;
+    double rotatedX = cos(-_vehicleDirection) * xR1 - sin(-_vehicleDirection) * yR1;
+    double rotatedY = sin(-_vehicleDirection) * xR1 + cos(-_vehicleDirection) * yR1;
 
     double x0 = rotatedX * scale();
     double y0 = rotatedY * scale();

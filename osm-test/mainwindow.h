@@ -8,6 +8,8 @@
 #include "waysignaldetector.h"
 #include "forwardview.h"
 #include "mapcache.h"
+#include <QXmlStreamReader>
+#include "gpscoordinate.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,18 +32,21 @@ private slots:
 
 private:
     void refreshData();
-    void gatherCurrentPositionData(double X, double Y);
-    void queryDatabase(double X, double Y);
+    void gatherCurrentPositionData(double X, double Y, double speed);
+    void queryDatabase(double X, double Y, double speed);
 
 private:
     Ui::MainWindow *ui;
 
-    double minX;
-    double minY;
-    double maxX;
-    double maxY;
     double currentX;
     double currentY;
+    double currentSpeed;
+    double currentDirection;
+    QString currentTime;
+    double currentXPos;
+    double currentYPos;
+    double currentZPos;
+
     double prevX;
     double prevY;
     double elapsedTime;
@@ -51,6 +56,9 @@ private:
     OSMHandlerPtr _osmHandler;
     WaySignalDetectorPtr _signalDetector;
     MapCachePtr _mapCache;
+
+    QXmlStreamReader xmlReader;
+    QList<GPSCoordinatePtr> _coordinates;
 };
 
 #endif // MAINWINDOW_H

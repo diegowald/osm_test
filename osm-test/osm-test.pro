@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql xml
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(opengl): QT += opengl
 
@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     forwardviewwidget.cpp \
     mapviewwidget.cpp \
     mapcache.cpp \
-    feature.cpp
+    feature.cpp \
+    gpscoordinate.cpp
 
 HEADERS  += mainwindow.h \
     nodeassociatedtoway.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     forwardviewwidget.h \
     mapviewwidget.h \
     mapcache.h \
-    feature.h
+    feature.h \
+    gpscoordinate.h
 
 FORMS    += mainwindow.ui
 

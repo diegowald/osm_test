@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
+#include <QIODevice>
+
 //#include <QVariant>
 //#include <QSqlQuery>
 //#include <QSqlError>
@@ -11,16 +13,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    minX = 0;
-    minY = 0;
-    maxX = 0;
-    maxY = 0;
     elapsedTime = 0.;
-    currentX = minX;
-    currentY = minY;
-    prevX = minX;
-    prevY = minY;
-
+    currentX = 0;
+    currentY = 0;
+    prevX = 0;
+    prevY = 0;
+    currentSpeed = 0;
+    currentDirection = 0;
+    currentTime = "";
+    currentXPos = 0;
+    currentYPos = 0;
+    currentZPos = 0;
     playing = false;
     refreshData();
     timer = new QTimer(this);
@@ -53,6 +56,73 @@ MainWindow::MainWindow(QWidget *parent) :
         QString e1 = QString::fromStdString(e);
         //qDebug() << e1;
     }*/
+
+
+    QFile file("driving_20150922.xml");
+    file.open(QFile::ReadOnly);
+    xmlReader.setDevice(&file);
+
+    xmlReader.readNextStartElement();
+
+    if (xmlReader.isStartElement() && xmlReader.name() == "root")
+    {
+        xmlReader.readNextStartElement();
+        if (xmlReader.name() == "driving")
+        {
+            while (xmlReader.readNextStartElement())
+            {
+                if (xmlReader.name() == "data")
+                {
+                    QString time;
+                    QString latitude;
+                    QString longitude;
+                    QString x;
+                    QString y;
+                    QString z;
+                    QString wheel;
+                    QString speed;
+                    while (xmlReader.readNextStartElement())
+                    {
+                        if (xmlReader.name() == "time")
+                        {
+                            time = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "latitude")
+                        {
+                            latitude = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "longitude")
+                        {
+                            longitude = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "x")
+                        {
+                            x = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "y")
+                        {
+                            y = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "z")
+                        {
+                            z = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "wheel")
+                        {
+                            wheel = xmlReader.readElementText();
+                        }
+                        else if (xmlReader.name() == "speed")
+                        {
+                            speed = xmlReader.readElementText();
+                        }
+                    }
+                    _coordinates.append(GPSCoordinatePtr::create(time,
+                                                                 latitude, longitude,
+                                                                 x, y, z, wheel, speed));
+                }
+            }
+        }
+    }
 }
 
 MainWindow::~MainWindow()
@@ -63,28 +133,25 @@ MainWindow::~MainWindow()
 void MainWindow::on_btnSetup_released()
 {
     // Since it's a dummy test. Let's hardcode this part.
-    /*minX = -62.3155083;
-    minY = -38.7235012;
-    maxX = -62.2728802;
-    maxY = -38.6909236;*/
-    minX = 127.3666;
-    minY = 36.2998;
-    maxX = 127.3666;
-    maxY = 36.3426;
 
+    currentDirection = 0;
+    currentSpeed = 0;
     elapsedTime = 0.;
     refreshData();
 }
 
 void MainWindow::refreshData()
 {
-    ui->txtLongFrom->setText(QString::number(minX));
-    ui->txtLatFrom->setText(QString::number(minY));
-    ui->txtLongTo->setText(QString::number(maxX));
-    ui->txtLatTo->setText(QString::number(maxY));
     ui->txtLongitude->setText(QString::number(currentX));
     ui->txtLatitude->setText(QString::number(currentY));
     ui->btnPlayStop->setText(playing ? "Stop" : "Play");
+
+    ui->lblSpeed->setText(QString::number(currentSpeed));
+    ui->lblDirection->setText(QString::number(currentDirection));
+    ui->lblTime->setText(currentTime);
+    ui->lblX->setText(QString::number(currentXPos));
+    ui->lblY->setText(QString::number(currentYPos));
+    ui->lblZ->setText(QString::number(currentZPos));
 }
 
 void MainWindow::on_btnPlayStop_released()
@@ -92,9 +159,7 @@ void MainWindow::on_btnPlayStop_released()
     if (!playing)
     {
         playing = true;
-        currentY = minY;
-        currentX = minX;
-        timer->start(1000);
+        timer->start(100);
     }
     else
     {
@@ -107,42 +172,59 @@ void MainWindow::on_btnPlayStop_released()
 
 void MainWindow::on_moveLocation()
 {
-    prevX = currentX;
-    prevY = currentY;
-    double delta = (maxY - minY) / 100;
-    qDebug() << delta;
-    currentY+= delta;
-    delta = (maxX - minX) / 100;
-    qDebug() << delta;
-    currentX += delta;
+    if (prevX != currentX)
+        prevX = currentX;
+    if (prevY != currentY)
+        prevY = currentY;
+
+    currentX = _coordinates.at(elapsedTime)->longitude();
+    currentY = _coordinates.at(elapsedTime)->latitude();
+
+    qDebug() << "prevX " << prevX << " prevY " << prevY;
+    qDebug() << "currentX " << currentX << " currentY " << currentY;
+
+    currentDirection = _coordinates.at(elapsedTime)->wheel();
+    currentSpeed = _coordinates.at(elapsedTime)->speed();
+
+    currentTime = _coordinates.at(elapsedTime)->time();
+    currentXPos = _coordinates.at(elapsedTime)->x();
+    currentYPos = _coordinates.at(elapsedTime)->y();
+    currentZPos = _coordinates.at(elapsedTime)->z();
+
     elapsedTime++;
-    if (elapsedTime > 100)
+    if (elapsedTime > _coordinates.count())
     {
-        currentY = minY;
         elapsedTime = 0;
     }
-    qDebug() << "x= " << currentX << " y= " << currentY;
-    gatherCurrentPositionData(currentX, currentY);
+    if ((currentSpeed > 0) && ((prevX != currentX) || (prevY != currentY)))
+    {
+        gatherCurrentPositionData(currentX, currentY, currentSpeed);
+    }
     refreshData();
 }
 
 
-void MainWindow::gatherCurrentPositionData(double X, double Y)
+void MainWindow::gatherCurrentPositionData(double X, double Y, double speed)
 {
     //QFuture<void> future = QtConcurrent::run(this, &MainWindow::queryDatabase, X, Y);
-    queryDatabase(X, Y);
+    queryDatabase(X, Y, speed);
 }
 
-void MainWindow::queryDatabase(double X, double Y)
+void MainWindow::queryDatabase(double X, double Y, double speed)
 {
     double direction = 0;
     double deltaX = currentX - prevX;
     double deltaY = currentY - prevY;
     double signX = deltaX < 0 ? -1. : 1.;
     double signY = deltaY < 0 ? -1. : 1.;
-    direction = abs(deltaX) < 0.001
+    qDebug() << "deltaX " << deltaX << " deltaY " << deltaY;
+    qDebug() << deltaY / deltaX;
+    direction = /*abs(deltaX) < 1e-10
             ? signY * 3.141592654 / 2
-            : atan(deltaY / deltaX);
+            :*/ atan2(deltaY, deltaX);
+    direction = 3.141592654 / 2 - direction;
+    direction = speed > 0 ? direction : 0;
+
 
     QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction);
     ui->nodeInformation->setRowCount(0);
@@ -197,10 +279,10 @@ void MainWindow::queryDatabase(double X, double Y)
     ui->forwardViewWidget->repaint();
 
     
-    QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 4 * maxDist);
-    QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 4 * maxDist);
-    intersectionWays = _mapCache->nearestWays(X, Y, 4 * maxDist);
-    ui->mapWidget->setMaxDistance(maxDist * 3);
+    QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);
+    QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
+    intersectionWays = _mapCache->nearestWays(X, Y, 1.5 * maxDist);
+    ui->mapWidget->setMaxDistance(maxDist);
     ui->mapWidget->setVehicleCoordinates(X, Y);
     ui->mapWidget->setWays(intersectionWays);
     ui->mapWidget->setVehicleDirection(direction);
