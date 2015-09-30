@@ -5,7 +5,7 @@
 WaySignalDetector::WaySignalDetector(OSMHandlerPtr osmHandler, QObject *parent) : QObject(parent)
 {
     _handler = osmHandler;
-    maxDistanceMeters = 500.;
+    maxDistanceMeters = 750.;
     maxDistance = meters2Degrees(maxDistanceMeters);
     qDebug() << maxDistanceMeters;
     qDebug() << maxDistance;
@@ -26,9 +26,8 @@ QList<NodeAssociatedToWayPtr> WaySignalDetector::getUpcommingSignals(double &x, 
 {
     QList<NodeAssociatedToWayPtr> nodes;
 
-    int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
-
-    //int nearestWay = _handler->wayByNodeId(nearestNode);
+    //int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
+    int nearestWay = _handler->nearestWay(x, y, maxDistance);
 
     nodes = _handler->getInfoNodes(nearestWay, x, y, maxDistance);
     return nodes;
@@ -36,8 +35,8 @@ QList<NodeAssociatedToWayPtr> WaySignalDetector::getUpcommingSignals(double &x, 
 
 QList<NodeAssociatedToWayPtr> WaySignalDetector::getUpcommingIntersections(double &x, double &y, double &direction)
 {
-    int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
-    //int nearestWay = _handler->wayByNodeId(nearestNode);
+    //int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
+    int nearestWay = _handler->nearestWay(x, y, maxDistance);
 
     QList<NodeAssociatedToWayPtr> intersections = _handler->getIntersections(nearestWay, x, y, maxDistance);
     return intersections;
@@ -59,7 +58,8 @@ double WaySignalDetector::degrees2meters(double &degrees)
 
 WayPtr WaySignalDetector::getCurrentWay(double &x, double &y, double &direction)
 {
-    int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
+    //int nearestWay = _handler->nearestWay(x, y, direction, maxDistance);
+    int nearestWay = _handler->nearestWay(x, y, maxDistance);
     return WayPtr::create(_handler.data(), nearestWay);
 }
 

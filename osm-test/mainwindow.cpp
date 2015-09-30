@@ -24,6 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
     currentXPos = 0;
     currentYPos = 0;
     currentZPos = 0;
+    lastRefresh = -1e100;
+    maxTimeWithoutRefreshThreshold = 10;
+
     playing = false;
     refreshData();
     timer = new QTimer(this);
@@ -192,13 +195,15 @@ void MainWindow::on_moveLocation()
     currentZPos = _coordinates.at(elapsedTime)->z();
 
     elapsedTime++;
-    if (elapsedTime > _coordinates.count())
+    if (elapsedTime >= _coordinates.count())
     {
         elapsedTime = 0;
     }
-    if ((currentSpeed > 0) && ((prevX != currentX) || (prevY != currentY)))
+    if (((elapsedTime - lastRefresh) > maxTimeWithoutRefreshThreshold) ||
+            ((currentSpeed > 0) && ((prevX != currentX) || (prevY != currentY))))
     {
         gatherCurrentPositionData(currentX, currentY, currentSpeed);
+        lastRefresh = elapsedTime;
     }
     refreshData();
 }
@@ -222,7 +227,8 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     direction = /*abs(deltaX) < 1e-10
             ? signY * 3.141592654 / 2
             :*/ atan2(deltaY, deltaX);
-    direction = 3.141592654 / 2 - direction;
+    direction = (currentDirection -90) * 3.141592654 / 180.;
+    //direction = 3.141592654 / 2 - direction;
     direction = speed > 0 ? direction : 0;
 
 

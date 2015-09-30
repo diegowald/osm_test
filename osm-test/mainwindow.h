@@ -50,6 +50,8 @@ private:
     double prevX;
     double prevY;
     double elapsedTime;
+    double lastRefresh;
+    double maxTimeWithoutRefreshThreshold;
     bool playing;
 
     QTimer *timer;

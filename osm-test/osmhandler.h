@@ -16,6 +16,7 @@ public:
     virtual ~OSMHandler();
 
     long nearestWay(double &x, double &y, double &direction, double &threshold);
+    long nearestWay(double &x, double &y, double &threshold);
     QList<long> nearestWays(double &x, double &y, double &threshold);
 
     long wayByNodeId(long nodeId);
