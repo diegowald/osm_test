@@ -10,6 +10,7 @@ GPSCoordinate::GPSCoordinate(QString time, QString latitude, QString longitude, 
     _z = z.toDouble();
     _wheel = wheel.toDouble();
     _speed = speed.toDouble();
+    _delayToNextCoord = 100;
 }
 
 
@@ -51,4 +52,14 @@ double GPSCoordinate::wheel() const
 double GPSCoordinate::speed() const
 {
     return _speed;
+}
+
+void GPSCoordinate::setDelayToNextCoord(int delta)
+{
+    _delayToNextCoord = delta;
+}
+
+int GPSCoordinate::delayToNextCoord() const
+{
+    return _delayToNextCoord;
 }

@@ -26,6 +26,8 @@ public:
     double wheel() const;
     double speed() const;
 
+    void setDelayToNextCoord(int delta);
+    int delayToNextCoord() const;
 signals:
 
 public slots:
@@ -39,6 +41,7 @@ private:
     double _z;
     double _wheel;
     double _speed;
+    int _delayToNextCoord;
 };
 
 typedef QSharedPointer<GPSCoordinate> GPSCoordinatePtr;

@@ -34,6 +34,7 @@ private:
     void refreshData();
     void gatherCurrentPositionData(double X, double Y, double speed);
     void queryDatabase(double X, double Y, double speed);
+    void processDeltaTimes();
 
 private:
     Ui::MainWindow *ui;
@@ -54,7 +55,7 @@ private:
     double maxTimeWithoutRefreshThreshold;
     bool playing;
 
-    QTimer *timer;
+    QTimer *_timer;
     OSMHandlerPtr _osmHandler;
     WaySignalDetectorPtr _signalDetector;
     MapCachePtr _mapCache;

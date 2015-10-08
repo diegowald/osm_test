@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     playing = false;
     refreshData();
-    timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainWindow::on_moveLocation);
+    _timer = new QTimer(this);
+    connect(_timer, &QTimer::timeout, this, &MainWindow::on_moveLocation);
 
     _osmHandler = OSMHandlerPtr::create("map.sqlite");
     _signalDetector = WaySignalDetectorPtr::create(_osmHandler);
@@ -126,11 +126,34 @@ MainWindow::MainWindow(QWidget *parent) :
             }
         }
     }
+    processDeltaTimes();
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::processDeltaTimes()
+{
+    if (_coordinates.count() > 0)
+    {
+        GPSCoordinatePtr coord = _coordinates.at(0);
+        QString s = coord->time().replace("[", "").replace("]", "");
+        QTime t = QTime::fromString(s, "hh:mm:ss");
+        for (int i = 1; i < _coordinates.count(); ++i)
+        {
+            GPSCoordinatePtr nextCoord = _coordinates.at(i);
+            s = nextCoord->time().replace("[", "").replace("]", "");
+            QTime t1 = QTime::fromString(s, "hh:mm:ss");
+            int delta = t.elapsed() - t1.elapsed();
+            coord->setDelayToNextCoord(delta <= 0 ? 10 : delta);
+            coord = nextCoord;
+            t = t1;
+        }
+    }
 }
 
 void MainWindow::on_btnSetup_released()
@@ -162,12 +185,12 @@ void MainWindow::on_btnPlayStop_released()
     if (!playing)
     {
         playing = true;
-        timer->start(100);
+        _timer->singleShot(10, this, SLOT(on_moveLocation()));
     }
     else
     {
         playing = false;
-        timer->stop();
+        _timer->stop();
         elapsedTime = 0;
     }
     refreshData();
@@ -193,7 +216,7 @@ void MainWindow::on_moveLocation()
     currentXPos = _coordinates.at(elapsedTime)->x();
     currentYPos = _coordinates.at(elapsedTime)->y();
     currentZPos = _coordinates.at(elapsedTime)->z();
-
+    int delayToNext = _coordinates.at(elapsedTime)->delayToNextCoord();
     elapsedTime++;
     if (elapsedTime >= _coordinates.count())
     {
@@ -206,6 +229,7 @@ void MainWindow::on_moveLocation()
         lastRefresh = elapsedTime;
     }
     refreshData();
+    _timer->singleShot(delayToNext, this, SLOT(on_moveLocation()));
 }
 
 
