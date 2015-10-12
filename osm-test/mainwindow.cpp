@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
 #include <QtConcurrent/QtConcurrent>
 #include <QIODevice>
 
@@ -148,7 +147,7 @@ void MainWindow::processDeltaTimes()
             GPSCoordinatePtr nextCoord = _coordinates.at(i);
             s = nextCoord->time().replace("[", "").replace("]", "");
             QTime t1 = QTime::fromString(s, "hh:mm:ss");
-            int delta = t.elapsed() - t1.elapsed();
+            int delta = t1.msecsSinceStartOfDay() - t.msecsSinceStartOfDay();
             coord->setDelayToNextCoord(delta <= 0 ? 10 : delta);
             coord = nextCoord;
             t = t1;
@@ -206,8 +205,8 @@ void MainWindow::on_moveLocation()
     currentX = _coordinates.at(elapsedTime)->longitude();
     currentY = _coordinates.at(elapsedTime)->latitude();
 
-    qDebug() << "prevX " << prevX << " prevY " << prevY;
-    qDebug() << "currentX " << currentX << " currentY " << currentY;
+    //qDebug() << "prevX " << prevX << " prevY " << prevY;
+    //qDebug() << "currentX " << currentX << " currentY " << currentY;
 
     currentDirection = _coordinates.at(elapsedTime)->wheel();
     currentSpeed = _coordinates.at(elapsedTime)->speed();
@@ -244,14 +243,9 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     double direction = 0;
     double deltaX = currentX - prevX;
     double deltaY = currentY - prevY;
-    double signX = deltaX < 0 ? -1. : 1.;
-    double signY = deltaY < 0 ? -1. : 1.;
-    qDebug() << "deltaX " << deltaX << " deltaY " << deltaY;
-    qDebug() << deltaY / deltaX;
-    direction = /*abs(deltaX) < 1e-10
-            ? signY * 3.141592654 / 2
-            :*/ atan2(deltaY, deltaX);
-    direction = (currentDirection -90) * 3.141592654 / 180.;
+
+    direction = 3 * 3.141592654 / 2 + atan2(deltaY, deltaX);
+    //direction = (currentDirection -90) * 3.141592654 / 180.;
     //direction = 3.141592654 / 2 - direction;
     direction = speed > 0 ? direction : 0;
 

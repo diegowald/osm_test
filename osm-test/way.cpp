@@ -1,6 +1,7 @@
 #include "way.h"
 #include "vector2d.h"
 
+#define MAXDIST 1e100;
 
 Way::Way(OSMHandler *osmHandler, long way_id, QObject *parent) : Feature(parent)
 {
@@ -11,50 +12,104 @@ Way::Way(OSMHandler *osmHandler, long way_id, QObject *parent) : Feature(parent)
     foreach (QString k, values.keys())
     {
         addKeyValue(k, values[k]);
+        //qDebug() << k << ", " << values[k];
     }
 }
 
 
-bool Way::pointInWay(double &x, double &y, double &direction, double &threshold)
+double Way::pointInWay(double &x, double &y, double &direction, double &threshold)
 {
+    double maxDistance = MAXDIST;
     for (int i = 1; i < _points.count(); ++i)
     {
-        if (pointInSegment(x, y, i))
+        double distance = pointInSegment(x, y, i);
+        if (distance < maxDistance)
         {
-            return isDirectionAlignedToSegment(i, direction, threshold);
+            maxDistance = distance;
+            //return isDirectionAlignedToSegment(i, direction, threshold);
         }
     }
+    return maxDistance;
 }
 
-bool Way::pointInWay(double &x, double &y)
+double Way::pointInWay(double &x, double &y)
 {
+    double maxDistance = MAXDIST;
     for (int i = 1; i < _points.count(); ++i)
     {
-        if (pointInSegment(x, y, i))
+        double distance = distToSegment(x, y, i);
+        if (distance < maxDistance)
         {
-            return true;
+            maxDistance = distance;
         }
     }
-    return false;
+    return maxDistance;
+}
+
+double Way::distToSegment(double xp, double yp, int segmentIndex)
+{
+    Vector2D v1, v2;
+    OSMPointPtr pt1, pt2;
+    pt1 = _points.at(segmentIndex - 1);
+    pt2 = _points.at(segmentIndex);
+
+    return distToSegment(xp, yp,
+                         pt1->x(), pt1->y(),
+                         pt2->x(), pt2->y());
 }
 
 bool Way::pointInSegment(double &x, double &y, int lastIndex)
 {
-    Vector2D v1, v2;
     OSMPointPtr pt1, pt2;
     pt1 = _points.at(lastIndex - 1);
     pt2 = _points.at(lastIndex);
-    v1.setBy2Points(pt1->x(), pt1->y(), pt2->x(), pt2->y());
-    v2.setBy2Points(pt1->x(), pt1->y(), x, y);
 
-    double module1 = v1.module();
-    //double module2 = v2.module();
-    double scalar = v1.scalar(v2);
 
-    double projection = scalar / module1;
+    double l2 = dist2(pt1->x(), pt1->y(), pt2->x(), pt2->y());
+    if (l2 == 0.)
+        return dist2(x, y, pt1->x(), pt2->x());
 
-    return ((0 <= scalar) && (scalar <= module1));
+    double t = ((x - pt1->x()) * (pt2->x() - pt1->x()) + (y - pt1->y()) * (pt2->y() - pt1->y())) / l2;
+
+    return (0 <= t) && (t <= 1);
 }
+
+double Way::sqr(double x)
+{
+    return x * x;
+}
+
+double Way::dist2(double x1, double y1, double x2, double y2)
+{
+    return sqr(x1 - x2) + sqr(y1 - y2);
+}
+
+double Way::distToSegmentSquared(double xp, double yp,
+                                 double xv, double yv,
+                                 double xw, double yw)
+{
+    double l2 = dist2(xv, yv, xw, yw);
+    if (l2 == 0.)
+        return dist2(xp, yp, xv, yv);
+
+    double t = ((xp - xv) * (xw - xv) + (yp - yv) * (yw - yv)) / l2;
+
+    if (t < 0) return dist2(xp, yp, xv, yv);
+
+    if (t > 1) return dist2(xp, yp, xw, yw);
+
+    return dist2(xp, yp,
+                 xv + t * (xw - xv),
+                 yv + t * (yw - yv));
+}
+
+double Way::distToSegment(double xp, double yp,
+                          double xv, double yv,
+                          double xw, double yw)
+{
+    return sqrt(distToSegmentSquared(xp, yp, xv, yv, xw, yw));
+}
+
 
 bool Way::isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold)
 {
@@ -89,4 +144,5 @@ double Way::getOrientation(double &x, double &y, double &direction)
             return segmentOrientation(i);
         }
     }
+    return 0;
 }

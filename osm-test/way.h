@@ -12,8 +12,8 @@ class Way : public Feature
 public:
     explicit Way(OSMHandler *osmHandler, long way_id, QObject *parent = 0);
 
-    bool pointInWay(double &x, double &y, double &direction, double &threshold);
-    bool pointInWay(double &x, double &y);
+    double pointInWay(double &x, double &y, double &direction, double &threshold);
+    double pointInWay(double &x, double &y);
 
     QList<OSMPointPtr> points() const;
 
@@ -22,6 +22,19 @@ private:
     bool pointInSegment(double &x, double& y, int lastIndex);
     bool isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold);
     double segmentOrientation(int lastIndex);
+
+    double sqr(double x);
+    double dist2(double x1, double y1, double x2, double y2);
+
+    double distToSegmentSquared(double xp, double yp,
+                                double xv, double yv,
+                                double xw, double yw);
+    double distToSegment(double xp, double yp,
+                         double xv, double yv,
+                         double xw, double yw);
+
+    double distToSegment(double xp, double yp, int segmentIndex);
+
 signals:
 
 public slots:

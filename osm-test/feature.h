@@ -16,7 +16,7 @@ public:
     void addKeyValue(const QString &key, const QString &value);
 
     QString toString() const;
-    QString value(const QString &key);
+    QString value(const QString &key, const QString &defaultValue);
     long id() const;
 
 signals:

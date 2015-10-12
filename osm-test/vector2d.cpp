@@ -71,12 +71,13 @@ Vector2D::Vector2D(Vector2D &other) : QObject(other.parent())
 
 double Vector2D::angle() const
 {
+    double pi = 3.141592654;
     if (fabs(_x) < 0.0001)
     {
-        return ((_y < 0) ? -1 : 1) *  3.141592654 / 2;
+        return ((_y < 0) ? -1 : 1) *  pi / 2;
     }
     else
     {
-        return atan(_y / _x);
+        return 3 * 3.141592654 / 2 + atan2(_y, _x);
     }
 }

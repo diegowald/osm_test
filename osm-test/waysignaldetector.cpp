@@ -1,5 +1,4 @@
 #include "waysignaldetector.h"
-#include <QDebug>
 
 
 WaySignalDetector::WaySignalDetector(OSMHandlerPtr osmHandler, QObject *parent) : QObject(parent)
@@ -7,9 +6,9 @@ WaySignalDetector::WaySignalDetector(OSMHandlerPtr osmHandler, QObject *parent) 
     _handler = osmHandler;
     maxDistanceMeters = 750.;
     maxDistance = meters2Degrees(maxDistanceMeters);
-    qDebug() << maxDistanceMeters;
-    qDebug() << maxDistance;
-    qDebug() << degrees2meters(maxDistance);
+    //qDebug() << maxDistanceMeters;
+    //qDebug() << maxDistance;
+    //qDebug() << degrees2meters(maxDistance);
 }
 
 

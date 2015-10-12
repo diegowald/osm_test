@@ -36,6 +36,7 @@ private:
     void drawWay(QPainter &painter, WayPtr way, QColor color);
     void drawSignal(QPainter &painter, NodeAssociatedToWayPtr node);
     QPixmap pixmap(NodeAssociatedToWayPtr node);
+    double rad2Deg(double rad);
 
 private:
     double _maxDistance;

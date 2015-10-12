@@ -6,7 +6,6 @@
 #include "nodeassociatedtoway.h"
 #include "osmhandler.h"
 #include "waysignaldetector.h"
-#include "forwardview.h"
 #include "mapcache.h"
 #include <QXmlStreamReader>
 #include "gpscoordinate.h"

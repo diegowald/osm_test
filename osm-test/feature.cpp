@@ -26,9 +26,9 @@ QString Feature::toString() const
     return s;
 }
 
-QString Feature::value(const QString &key)
+QString Feature::value(const QString &key, const QString &defaultValue)
 {
-    return values.contains(key) ? values[key] : "x";
+    return values.contains(key) ? values[key] : defaultValue;
 }
 
 long Feature::id() const

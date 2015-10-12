@@ -22,7 +22,6 @@ SOURCES += main.cpp\
     way.cpp \
     osmpoint.cpp \
     vector2d.cpp \
-    forwardview.cpp \
     forwardviewwidget.cpp \
     mapviewwidget.cpp \
     mapcache.cpp \
@@ -36,7 +35,6 @@ HEADERS  += mainwindow.h \
     way.h \
     osmpoint.h \
     vector2d.h \
-    forwardview.h \
     forwardviewwidget.h \
     mapviewwidget.h \
     mapcache.h \
