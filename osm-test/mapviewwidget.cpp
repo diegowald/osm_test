@@ -1,7 +1,6 @@
 #include "mapviewwidget.h"
 #include <QPaintEvent>
 #include <QPainter>
-#include <QDebug>
 
 
 MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
@@ -18,22 +17,6 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
 {
     QPainter painter(this);
     QRect geo = this->geometry();
-
-/*    int x, y, width, height;
-
-    x = geo.x()-10;
-    y = geo.y()-10;
-    width = geo.width()-3;
-    height = geo.height()-5;
-
-    painter.fillRect(x, y, width, height, QColor(220,220,220));
-
-    painter.drawText(x+10, y+10, "Machine " + QString::number(1234));
-
-    painter.drawLine(
-                transformToWidgetCoords(QPointF(0,0)),
-                transformToWidgetCoords(QPointF(0.5, 0.3)));
-*/
 
     foreach (WayPtr w, _waterWays)
     {
@@ -66,6 +49,14 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
     pt.setX(pt.x() - pix.width() / 2);
     pt.setY(pt.y() - pix.height() / 2);
     painter.drawPixmap(pt, pix);
+
+    for (int i = 0; i < _prevX.count(); ++i)
+    {
+        pt.setX(_prevX.at(i));
+        pt.setY(_prevY.at(i));
+        pt = transformToWidgetCoords(pt);
+        painter.drawEllipse(pt, 3, 3);
+    }
 }
 
 void MapViewWidget::setMaxDistance(double distance)
@@ -81,6 +72,8 @@ double MapViewWidget::scale()
 
 void MapViewWidget::setVehicleCoordinates(double X, double Y)
 {
+    _prevX.append(_carX);
+    _prevY.append(_carY);
     _carX = X;
     _carY = Y;
 }
@@ -90,8 +83,8 @@ QPointF MapViewWidget::transformToWidgetCoords(QPointF realPoint)
     double xR1 = realPoint.x() - _carX;
     double yR1 = realPoint.y() - _carY;
 
-    double rotatedX = cos(-_vehicleDirection) * xR1 - sin(-_vehicleDirection) * yR1;
-    double rotatedY = sin(-_vehicleDirection) * xR1 + cos(-_vehicleDirection) * yR1;
+    double rotatedX = + cos(-_vehicleDirection) * xR1 - sin(-_vehicleDirection) * yR1;
+    double rotatedY = + sin(-_vehicleDirection) * xR1 + cos(-_vehicleDirection) * yR1;
 
     double x0 = rotatedX * scale();
     double y0 = rotatedY * scale();
@@ -148,7 +141,7 @@ void MapViewWidget::setVehicleDirection(double direction)
 
 QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
 {
-    QString signalType = node->value("highway");
+    QString signalType = node->value("highway", "");
     QPixmap pix;
     if (signalType == "traffic_signals")
     {
@@ -185,17 +178,17 @@ void MapViewWidget::classifyFeatures()
     _waterWays.clear();
     foreach (WayPtr way, _linearFeatures)
     {
-        if (way->value("highway").length() > 0)
+        if (way->value("highway", "").length() > 0)
         {
             _highways.append(way);
         }
-        else if (way->value("waterway").length() > 0)
+        else if (way->value("waterway", "").length() > 0)
         {
             _waterWays.append(way);
         }
         else
         {
-            qDebug() << way->toString();
+            //qDebug() << way->toString();
         }
     }
 }

@@ -49,6 +49,9 @@ private:
     QList<WayPtr> _waterWays;
     QList<WayPtr> _highways;
     QList<WayPtr> _greenAreas;
+
+    QList<double> _prevX;
+    QList<double> _prevY;
 };
 
 #endif // MAPVIEWWIDGET_H
