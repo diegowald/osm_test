@@ -20,3 +20,8 @@ double NodeAssociatedToWay::Y() const
 {
     return _y;
 }
+
+int NodeAssociatedToWay::numPoints()
+{
+    return 1;
+}

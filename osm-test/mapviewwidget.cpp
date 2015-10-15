@@ -1,7 +1,7 @@
 #include "mapviewwidget.h"
 #include <QPaintEvent>
 #include <QPainter>
-
+#include <QDebug>
 
 MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
 {
@@ -18,30 +18,13 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
     QPainter painter(this);
     QRect geo = this->geometry();
 
-    foreach (WayPtr w, _waterWays)
-    {
-        drawWay(painter, w, QColor(Qt::blue));
-    }
+    paintMap(painter);
 
-    foreach (WayPtr w, _highways)
-    {
-        drawWay(painter, w, QColor(Qt::darkGray));
-    }
-
-    foreach (WayPtr w, _ways)
-    {
-        drawWay(painter, w, QColor(Qt::darkGray));
-    }
-
-    foreach (NodeAssociatedToWayPtr node, _pointFeatures)
-    {
-        drawSignal(painter, node);
-    }
 
     QPixmap pix(":/signals/car");
     QPointF pt;
-//    pt.setX((width() - pix.width())/2);
-//    pt.setY((height() - pix.height())/2);
+    //    pt.setX((width() - pix.width())/2);
+    //    pt.setY((height() - pix.height())/2);
 
     pt.setX(_carX);
     pt.setY(_carY);
@@ -102,26 +85,27 @@ void MapViewWidget::drawSignal(QPainter &painter, NodeAssociatedToWayPtr node)
     painter.drawPixmap(pt, pix);
 }
 
-void MapViewWidget::drawWay(QPainter &painter, WayPtr way, QColor color)
+void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature, QColor color)
 {
-    if (way.isNull())
+    if (feature.isNull())
         return;
-    if (way->points().count() == 0)
-        return;
-    OSMPointPtr p = way->points().at(0);
-    QPointF pt0 = transformToWidgetCoords(QPointF(p->x(), p->y()));
-    for (int i = 1; i < way->points().count(); ++i)
+    if (feature->numPoints() > 1)
     {
-        p = way->points().at(i);
-        QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
-        QPen pen(color);
-        pen.setWidth(2);
-        painter.setPen(pen);
-        painter.drawLine(pt0, pt1);
-        pt0 = pt1;
+        WayPtr way = qSharedPointerDynamicCast<Way>(feature);
+        OSMPointPtr p = way->points().at(0);
+        QPointF pt0 = transformToWidgetCoords(QPointF(p->x(), p->y()));
+        for (int i = 1; i < way->points().count(); ++i)
+        {
+            p = way->points().at(i);
+            QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
+            QPen pen(color);
+            pen.setWidth(2);
+            painter.setPen(pen);
+            painter.drawLine(pt0, pt1);
+            pt0 = pt1;
+        }
     }
 }
-
 
 
 void MapViewWidget::setWays(QList<WayPtr> &ways)
@@ -151,7 +135,7 @@ QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
     {
         pix =  QPixmap(":/signals/noParking");
     }
-/*    turning_circle
+    /*    turning_circle
     bus_stop
     speed_camera
     street_lamp
@@ -172,13 +156,132 @@ void MapViewWidget::setPointFeatures(QList<NodeAssociatedToWayPtr> &pts)
 }
 
 
+//based on http://wiki.openstreetmap.org/wiki/Map_Features
 void MapViewWidget::classifyFeatures()
 {
     _highways.clear();
     _waterWays.clear();
+
+    _waterWays.clear();
+    _highways.clear();
+    _greenAreas.clear();
+
+    _aerialway.clear();
+    _aeroway.clear();
+    _amenity.clear();
+    _healthcare.clear();
+    _barrier.clear();
+    _boundary.clear();
+    _admin_level.clear();
+    _building.clear();
+    _emergency.clear();
+    _geological.clear();
+    _historic.clear();
+    _landuse.clear();
+    _leisure.clear();
+
+    _man_made.clear();
+    _military.clear();
+    _natural.clear();
+    _office.clear();
+    _place.clear();
+    _power.clear();
+    _public_transport.clear();
+    _railway.clear();
+    _bridge.clear();
+
+
     foreach (WayPtr way, _linearFeatures)
     {
-        if (way->value("highway", "").length() > 0)
+        if (way->value("aerialway", "").length() > 0)
+        {
+            _aerialway.append(way);
+        }
+        else if (way->value("aeroway", "").length() > 0)
+        {
+            _aeroway.append(way);
+        }
+        else if (way->value("amenity", "").length() > 0)
+        {
+            _amenity.append(way);
+        }
+        else if (way->value("healthcare", "").length() > 0)
+        {
+            _healthcare.append(way);
+        }
+        else if (way->value("barrier", "").length() > 0)
+        {
+            _barrier.append(way);
+        }
+        else if (way->value("boundary", "").length() > 0)
+        {
+            _boundary.append(way);
+        }
+        else if (way->value("admin_level", "").length() > 0)
+        {
+            _admin_level.append(way);
+        }
+        else if (way->value("building", "").length() > 0)
+        {
+            _building.append(way);
+        }
+        else if (way->value("emergency", "").length() > 0)
+        {
+            _emergency.append(way);
+        }
+        else if (way->value("geological", "").length() > 0)
+        {
+            _geological.append(way);
+        }
+        else if (way->value("historic", "").length() > 0)
+        {
+            _historic.append(way);
+        }
+        else if (way->value("landuse", "").length() > 0)
+        {
+            _landuse.append(way);
+        }
+        else if (way->value("leisure", "").length() > 0)
+        {
+            _leisure.append(way);
+        }
+        else if (way->value("man_made", "").length() > 0)
+        {
+            _man_made.append(way);
+        }
+        else if (way->value("military", "").length() > 0)
+        {
+            _military.append(way);
+        }
+        else if (way->value("natural", "").length() > 0)
+        {
+            _natural.append(way);
+        }
+        else if (way->value("office", "").length() > 0)
+        {
+            _office.append(way);
+        }
+        else if (way->value("place", "").length() > 0)
+        {
+            _place.append(way);
+        }
+        else if (way->value("power", "").length() > 0)
+        {
+            _power.append(way);
+        }
+        else if (way->value("public_transport", "").length() > 0)
+        {
+            _public_transport.append(way);
+        }
+        else if (way->value("railway", "").length() > 0)
+        {
+            _railway.append(way);
+        }
+        else if (way->value("bridge", "").length() > 0)
+        {
+            _bridge.append(way);
+        }
+        else if (way->value("highway", "").length() > 0)
         {
             _highways.append(way);
         }
@@ -188,11 +291,145 @@ void MapViewWidget::classifyFeatures()
         }
         else
         {
-            //qDebug() << way->toString();
+            qDebug() << way->toString();
         }
     }
 }
 
 void MapViewWidget::classifyPoints()
+{
+}
+
+void MapViewWidget::paintMap(QPainter &painter)
+{
+    // Background
+    painter.setBackground(QBrush(QColor(Qt::red), Qt::SolidPattern));
+    painter.setBackgroundMode(Qt::OpaqueMode);
+
+    QRect geo;
+    geo.setLeft(0);
+    geo.setTop(0);
+    geo.setWidth(width());
+    geo.setHeight(height());
+    painter.fillRect(geo, Qt::red);
+
+    foreach (FeaturePtr w, _waterWays)
+    {
+        drawWay(painter, w, QColor(Qt::blue));
+    }
+
+    foreach (FeaturePtr w, _highways)
+    {
+        drawWay(painter, w, QColor(Qt::darkGray));
+    }
+
+    /*foreach (FeaturePtr w, _ways)
+    {
+        drawWay(painter, w, QColor(Qt::darkGray));
+    }*/
+
+    foreach (NodeAssociatedToWayPtr node, _pointFeatures)
+    {
+        drawSignal(painter, node);
+    }
+}
+
+void MapViewWidget::drawWaterWays(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawHighways(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawGreenAreas(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawAerialway(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawAeroway(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawAmenity(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawHealthcare(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawBarrier(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawBoundary(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawAdmin_level(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawBuilding(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawEmergency(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawGeological(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawHistoric(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawLanduse(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawLeisure(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawMan_made(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawMilitary(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawNatural(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawOffice(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawPlace(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawPower(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawPublic_transport(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawRailway(QPainter &painter, FeaturePtr feature)
+{
+}
+
+void MapViewWidget::drawBridge(QPainter &painter, FeaturePtr feature)
 {
 }

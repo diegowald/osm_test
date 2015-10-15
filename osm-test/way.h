@@ -18,6 +18,9 @@ public:
     QList<OSMPointPtr> points() const;
 
     double getOrientation(double &x, double &y, double &direction);
+
+    virtual int numPoints();
+
 private:
     bool pointInSegment(double &x, double& y, int lastIndex);
     bool isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold);
