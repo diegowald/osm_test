@@ -16,6 +16,9 @@ public:
 
     double X() const;
     double Y() const;
+
+    virtual int numPoints();
+
 signals:
 
 public slots:

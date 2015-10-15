@@ -146,3 +146,8 @@ double Way::getOrientation(double &x, double &y, double &direction)
     }
     return 0;
 }
+
+int Way::numPoints()
+{
+    return _points.length();
+}

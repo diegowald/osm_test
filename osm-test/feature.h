@@ -19,6 +19,7 @@ public:
     QString value(const QString &key, const QString &defaultValue);
     long id() const;
 
+    virtual int numPoints() = 0;
 signals:
 
 public slots:
@@ -27,5 +28,7 @@ private:
     long _id;
     QMap<QString, QString> values;
 };
+
+typedef QSharedPointer<Feature> FeaturePtr;
 
 #endif // FEATURE_H
