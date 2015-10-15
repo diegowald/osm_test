@@ -29,7 +29,7 @@ public slots:
 private:
     double scale();
     QPointF transformToWidgetCoords(QPointF realPoint);
-    void drawWay(QPainter &painter, FeaturePtr feature, QColor color);
+    void drawWay(QPainter &painter, FeaturePtr feature);
     void drawSignal(QPainter &painter, NodeAssociatedToWayPtr node);
     QPixmap pixmap(NodeAssociatedToWayPtr node);
     void classifyFeatures();
@@ -63,6 +63,9 @@ private:
     void drawPublic_transport(QPainter &painter, FeaturePtr feature);
     void drawRailway(QPainter &painter, FeaturePtr feature);
     void drawBridge(QPainter &painter, FeaturePtr feature);
+
+    void drawPolygon(QPainter &painter, FeaturePtr feature, QColor &color);
+    void drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth);
 
 private:
     double _maxDistance;

@@ -85,26 +85,42 @@ void MapViewWidget::drawSignal(QPainter &painter, NodeAssociatedToWayPtr node)
     painter.drawPixmap(pt, pix);
 }
 
-void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature, QColor color)
+void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature)
 {
     if (feature.isNull())
         return;
-    if (feature->numPoints() > 1)
+
+    QString lanes = feature->value("lanes", "1");
+    int w = lanes.toInt();
+    QColor color;
+    color = Qt::black;
+    QString value = feature->value("highway", "");
+    if (value == "motorway")
     {
-        WayPtr way = qSharedPointerDynamicCast<Way>(feature);
-        OSMPointPtr p = way->points().at(0);
-        QPointF pt0 = transformToWidgetCoords(QPointF(p->x(), p->y()));
-        for (int i = 1; i < way->points().count(); ++i)
-        {
-            p = way->points().at(i);
-            QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
-            QPen pen(color);
-            pen.setWidth(2);
-            painter.setPen(pen);
-            painter.drawLine(pt0, pt1);
-            pt0 = pt1;
-        }
+        color = Qt::darkBlue;
     }
+/*         trunk
+            primary
+        secondary
+        tertiary
+         unclassified
+        residential
+            service
+        motorway_link
+            trunk_link
+            primary_link
+            secondary_link
+            tertiary_link
+            pedestrian
+         track
+         bus_guideway
+         raceway
+         road
+         footway
+         bridleway
+         steps
+        path*/
+    drawPolyline(painter, feature, color, w);
 }
 
 
@@ -303,7 +319,7 @@ void MapViewWidget::classifyPoints()
 void MapViewWidget::paintMap(QPainter &painter)
 {
     // Background
-    painter.setBackground(QBrush(QColor(Qt::red), Qt::SolidPattern));
+    painter.setBackground(QBrush(QColor(Qt::lightGray), Qt::SolidPattern));
     painter.setBackgroundMode(Qt::OpaqueMode);
 
     QRect geo;
@@ -311,16 +327,49 @@ void MapViewWidget::paintMap(QPainter &painter)
     geo.setTop(0);
     geo.setWidth(width());
     geo.setHeight(height());
-    painter.fillRect(geo, Qt::red);
+    painter.fillRect(geo, Qt::lightGray);
+
+    foreach (FeaturePtr feature, _boundary)
+    {
+        drawBoundary(painter, feature);
+    }
+
+/*    void drawAerialway(QPainter &painter, FeaturePtr feature);
+    void drawAeroway(QPainter &painter, FeaturePtr feature);
+    void drawAmenity(QPainter &painter, FeaturePtr feature);
+    void drawHealthcare(QPainter &painter, FeaturePtr feature);
+    void drawBarrier(QPainter &painter, FeaturePtr feature);
+
+    void drawAdmin_level(QPainter &painter, FeaturePtr feature);
+    void drawEmergency(QPainter &painter, FeaturePtr feature);
+    void drawGeological(QPainter &painter, FeaturePtr feature);
+    void drawHistoric(QPainter &painter, FeaturePtr feature);
+    void drawLanduse(QPainter &painter, FeaturePtr feature);
+    void drawLeisure(QPainter &painter, FeaturePtr feature);
+    void drawMan_made(QPainter &painter, FeaturePtr feature);
+    void drawMilitary(QPainter &painter, FeaturePtr feature);
+    void drawNatural(QPainter &painter, FeaturePtr feature);
+    void drawOffice(QPainter &painter, FeaturePtr feature);
+    void drawPlace(QPainter &painter, FeaturePtr feature);
+    void drawPower(QPainter &painter, FeaturePtr feature);
+    void drawPublic_transport(QPainter &painter, FeaturePtr feature);
+    void drawRailway(QPainter &painter, FeaturePtr feature);
+    void drawBridge(QPainter &painter, FeaturePtr feature);
+  */
 
     foreach (FeaturePtr w, _waterWays)
     {
-        drawWay(painter, w, QColor(Qt::blue));
+        drawWay(painter, w);
     }
 
     foreach (FeaturePtr w, _highways)
     {
-        drawWay(painter, w, QColor(Qt::darkGray));
+        drawWay(painter, w);
+    }
+
+    foreach (FeaturePtr feature, _building)
+    {
+        drawBuilding(painter, feature);
     }
 
     /*foreach (FeaturePtr w, _ways)
@@ -368,6 +417,8 @@ void MapViewWidget::drawBarrier(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawBoundary(QPainter &painter, FeaturePtr feature)
 {
+    QColor color(0, 120, 0);
+    drawPolygon(painter, feature, color);
 }
 
 void MapViewWidget::drawAdmin_level(QPainter &painter, FeaturePtr feature)
@@ -376,6 +427,8 @@ void MapViewWidget::drawAdmin_level(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawBuilding(QPainter &painter, FeaturePtr feature)
 {
+    QColor color(0, 0, 255);
+    drawPolygon(painter, feature, color);
 }
 
 void MapViewWidget::drawEmergency(QPainter &painter, FeaturePtr feature)
@@ -432,4 +485,48 @@ void MapViewWidget::drawRailway(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawBridge(QPainter &painter, FeaturePtr feature)
 {
+}
+
+void MapViewWidget::drawPolygon(QPainter &painter, FeaturePtr feature, QColor &color)
+{
+    if (feature.isNull())
+        return;
+    if (feature->numPoints() > 2)
+    {
+        WayPtr way = qSharedPointerDynamicCast<Way>(feature);
+        QPolygon polygon;
+        for (int i = 0; i < way->points().count(); ++i)
+        {
+            OSMPointPtr p = way->points().at(i);
+            QPointF pt = transformToWidgetCoords(QPointF(p->x(), p->y()));
+            polygon.push_back(pt.toPoint());
+        }
+        OSMPointPtr p = way->points().at(0);
+        QPointF pt = transformToWidgetCoords(QPointF(p->x(), p->y()));
+        polygon.push_back(pt.toPoint());
+        painter.setBrush(QBrush(color));;
+        painter.drawPolygon(polygon);
+    }
+}
+
+void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth)
+{
+    if (feature.isNull())
+        return;
+    if (feature->numPoints() > 1)
+    {
+        WayPtr way = qSharedPointerDynamicCast<Way>(feature);
+        OSMPointPtr p = way->points().at(0);
+        QPointF pt0 = transformToWidgetCoords(QPointF(p->x(), p->y()));
+        for (int i = 1; i < way->points().count(); ++i)
+        {
+            p = way->points().at(i);
+            QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
+            QPen pen(color);
+            pen.setWidth(penWidth);
+            painter.setPen(pen);
+            painter.drawLine(pt0, pt1);
+            pt0 = pt1;
+        }
+    }
 }
