@@ -91,7 +91,7 @@ void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature)
         return;
 
     QString lanes = feature->value("lanes", "1");
-    int w = lanes.toInt();
+    int w = lanes.toInt() * 5;
     QColor color;
     color = Qt::black;
     QString value = feature->value("highway", "");
@@ -99,13 +99,31 @@ void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature)
     {
         color = Qt::darkBlue;
     }
-/*         trunk
-            primary
-        secondary
-        tertiary
-         unclassified
-        residential
-            service
+    else if (value == "trunk")
+    {
+        color = Qt::darkGray;
+    }
+    else if (value == "primary")
+    {
+        color = Qt::darkRed;
+    }
+    else if (value == "secondary")
+    {
+        color = Qt::darkYellow;
+    }
+    else if (value == "tertiary")
+    {
+        color = Qt::yellow;
+    }
+    else if (value == "unclassified")
+    {
+        color = Qt::darkGray;
+    }
+    else if (value == "residential")
+    {
+        color = Qt::white;
+    }
+/*            service
         motorway_link
             trunk_link
             primary_link
