@@ -64,7 +64,7 @@ private:
     void drawRailway(QPainter &painter, FeaturePtr feature);
     void drawBridge(QPainter &painter, FeaturePtr feature);
 
-    void drawPolygon(QPainter &painter, FeaturePtr feature, QColor &color);
+    void drawPolygon(QPainter &painter, FeaturePtr feature, QColor &borderColor, QColor &color);
     void drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth);
 
 private:

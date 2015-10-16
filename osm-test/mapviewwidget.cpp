@@ -91,53 +91,85 @@ void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature)
         return;
 
     QString lanes = feature->value("lanes", "1");
-    int w = lanes.toInt() * 5;
+    int w = lanes.toInt() * 8;
     QColor color;
     color = Qt::black;
     QString value = feature->value("highway", "");
     if (value == "motorway")
     {
-        color = Qt::darkBlue;
+        color = QColor::fromRgb(0x87, 0xA2, 0xCA);
     }
     else if (value == "trunk")
     {
-        color = Qt::darkGray;
+        color = QColor::fromRgb(0x94, 0xd4, 0x94);
     }
     else if (value == "primary")
     {
-        color = Qt::darkRed;
+        color = QColor::fromRgb(0xDC, 0x9E, 0x9e);
     }
     else if (value == "secondary")
     {
-        color = Qt::darkYellow;
+        color = QColor::fromRgb(0xf8, 0xd5, 0xa9);
     }
     else if (value == "tertiary")
     {
-        color = Qt::yellow;
+        color = QColor::fromRgb(0xf8, 0xf8, 0xba);
     }
     else if (value == "unclassified")
     {
-        color = Qt::darkGray;
+        color = QColor::fromRgb(0xfe, 0xfe, 0xfe);
     }
     else if (value == "residential")
     {
-        color = Qt::white;
+        color = QColor::fromRgb(0xfe, 0xfe, 0xfe);
     }
-/*            service
-        motorway_link
-            trunk_link
-            primary_link
-            secondary_link
-            tertiary_link
-            pedestrian
-         track
-         bus_guideway
-         raceway
-         road
-         footway
-         bridleway
-         steps
-        path*/
+    else if (value == "service")
+    {
+        color = QColor::fromRgb(0xfe, 0xfe, 0xfe);
+    }
+    else if (value == "motorway_link")
+    {
+        color = QColor::fromRgb(0x87, 0xA2, 0xCA);
+    }
+    else if (value == "trunk_link")
+    {
+        color = QColor::fromRgb(0x94, 0xd4, 0x94);
+    }
+    else if (value == "primary_link")
+    {
+        color = QColor::fromRgb(0xDC, 0x9E, 0x9e);
+    }
+    else if (value == "secondary_link")
+    {
+        color = QColor::fromRgb(0xf8, 0xd5, 0xa9);
+    }
+    else if (value == "tertiary_link")
+    {
+        color = QColor::fromRgb(0xf8, 0xf8, 0xba);
+    }
+    else if (value == "pedestrian")
+    {
+       color = Qt::lightGray;
+    }
+    else if (value == "track")
+    {
+    }
+    else if (value == "bus_guideway")
+    {
+    }
+    else if (value == "raceway")
+    {
+    }
+    else if (value == "road")
+    {}
+    else if (value == "footway")
+    {}
+    else if (value == "bridleway")
+    {}
+    else if (value == "steps")
+    {}
+    else if (value == "path")
+    {}
     drawPolyline(painter, feature, color, w);
 }
 
@@ -352,6 +384,26 @@ void MapViewWidget::paintMap(QPainter &painter)
         drawBoundary(painter, feature);
     }
 
+    foreach (FeaturePtr feature, _military)
+    {
+        drawMilitary(painter, feature);
+    }
+
+    foreach (FeaturePtr feature, _geological)
+    {
+        drawGeological(painter, feature);
+    }
+
+    foreach (FeaturePtr feature, _landuse)
+    {
+        drawLanduse(painter, feature);
+    }
+
+    foreach (FeaturePtr feature, _leisure)
+    {
+        drawLeisure(painter, feature);
+    }
+
 /*    void drawAerialway(QPainter &painter, FeaturePtr feature);
     void drawAeroway(QPainter &painter, FeaturePtr feature);
     void drawAmenity(QPainter &painter, FeaturePtr feature);
@@ -360,30 +412,35 @@ void MapViewWidget::paintMap(QPainter &painter)
 
     void drawAdmin_level(QPainter &painter, FeaturePtr feature);
     void drawEmergency(QPainter &painter, FeaturePtr feature);
-    void drawGeological(QPainter &painter, FeaturePtr feature);
     void drawHistoric(QPainter &painter, FeaturePtr feature);
-    void drawLanduse(QPainter &painter, FeaturePtr feature);
-    void drawLeisure(QPainter &painter, FeaturePtr feature);
     void drawMan_made(QPainter &painter, FeaturePtr feature);
-    void drawMilitary(QPainter &painter, FeaturePtr feature);
     void drawNatural(QPainter &painter, FeaturePtr feature);
     void drawOffice(QPainter &painter, FeaturePtr feature);
     void drawPlace(QPainter &painter, FeaturePtr feature);
     void drawPower(QPainter &painter, FeaturePtr feature);
     void drawPublic_transport(QPainter &painter, FeaturePtr feature);
-    void drawRailway(QPainter &painter, FeaturePtr feature);
-    void drawBridge(QPainter &painter, FeaturePtr feature);
   */
+    foreach (FeaturePtr feature, _railway)
+    {
+        drawRailway(painter, feature);
+    }
 
     foreach (FeaturePtr w, _waterWays)
     {
         drawWay(painter, w);
     }
 
+
     foreach (FeaturePtr w, _highways)
     {
         drawWay(painter, w);
     }
+
+    foreach (FeaturePtr feature , _bridge)
+    {
+        drawBridge(painter, feature);
+    }
+
 
     foreach (FeaturePtr feature, _building)
     {
@@ -399,10 +456,12 @@ void MapViewWidget::paintMap(QPainter &painter)
     {
         drawSignal(painter, node);
     }
+
 }
 
 void MapViewWidget::drawWaterWays(QPainter &painter, FeaturePtr feature)
 {
+
 }
 
 void MapViewWidget::drawHighways(QPainter &painter, FeaturePtr feature)
@@ -436,7 +495,8 @@ void MapViewWidget::drawBarrier(QPainter &painter, FeaturePtr feature)
 void MapViewWidget::drawBoundary(QPainter &painter, FeaturePtr feature)
 {
     QColor color(0, 120, 0);
-    drawPolygon(painter, feature, color);
+    QColor border(0,0,0);
+    drawPolygon(painter, feature, border, color);
 }
 
 void MapViewWidget::drawAdmin_level(QPainter &painter, FeaturePtr feature)
@@ -445,8 +505,9 @@ void MapViewWidget::drawAdmin_level(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawBuilding(QPainter &painter, FeaturePtr feature)
 {
+    QColor border(0, 0, 0);
     QColor color(0, 0, 255);
-    drawPolygon(painter, feature, color);
+    drawPolygon(painter, feature, border, color);
 }
 
 void MapViewWidget::drawEmergency(QPainter &painter, FeaturePtr feature)
@@ -503,9 +564,14 @@ void MapViewWidget::drawRailway(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawBridge(QPainter &painter, FeaturePtr feature)
 {
+    QString lanes = feature->value("lanes", "1");
+    int w = lanes.toInt() * 8;
+    QColor color;
+    color = QColor::fromRgb(0x35, 0x35, 0x35);
+    drawPolyline(painter, feature, color, w);
 }
 
-void MapViewWidget::drawPolygon(QPainter &painter, FeaturePtr feature, QColor &color)
+void MapViewWidget::drawPolygon(QPainter &painter, FeaturePtr feature, QColor &borderColor, QColor &color)
 {
     if (feature.isNull())
         return;
@@ -522,6 +588,7 @@ void MapViewWidget::drawPolygon(QPainter &painter, FeaturePtr feature, QColor &c
         OSMPointPtr p = way->points().at(0);
         QPointF pt = transformToWidgetCoords(QPointF(p->x(), p->y()));
         polygon.push_back(pt.toPoint());
+        painter.setPen(QColor(borderColor));
         painter.setBrush(QBrush(color));;
         painter.drawPolygon(polygon);
     }
@@ -546,5 +613,7 @@ void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &
             painter.drawLine(pt0, pt1);
             pt0 = pt1;
         }
+        painter.drawText(pt0, feature->value("name", ""));
     }
+
 }
