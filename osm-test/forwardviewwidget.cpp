@@ -74,7 +74,7 @@ void ForwardViewWidget::setVehicleCoordinates(double X, double Y)
 
 QPointF ForwardViewWidget::transformToWidgetCoords(QPointF realPoint)
 {
-    double xR1 = realPoint.x() - _carX;
+    /*double xR1 = realPoint.x() - _carX;
     double yR1 = realPoint.y() - _carY;
 
     double angle =  3.141592654 / 2 - _rotation;
@@ -90,6 +90,24 @@ QPointF ForwardViewWidget::transformToWidgetCoords(QPointF realPoint)
     double y0 = rotatedY * scale();
 
     return QPointF(x0 + geometry().width() / 2., geometry().height() - y0);
+    */
+
+    double xR1 = realPoint.x() - _carX;
+    double yR1 = realPoint.y() - _carY;
+
+    double angle =  3.141592654 / 2 - _rotation;
+    if (fabs(_rotation - _vehicleDirection) > 3.141592654 / 2.)
+    {
+        angle -= 3.141592654;
+    }
+
+    double rotatedX = + cos(-angle) * xR1 - sin(-angle) * yR1;
+    double rotatedY = + sin(-angle) * xR1 + cos(-angle) * yR1;
+
+    double x0 = rotatedX * scale();
+    double y0 = rotatedY * scale();
+
+    return QPointF(x0 + geometry().width() / 2., geometry().height() / 2 - y0);
 }
 
 

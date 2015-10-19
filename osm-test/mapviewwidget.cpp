@@ -377,7 +377,7 @@ void MapViewWidget::paintMap(QPainter &painter)
     geo.setTop(0);
     geo.setWidth(width());
     geo.setHeight(height());
-    painter.fillRect(geo, Qt::lightGray);
+    painter.fillRect(geo, QColor::fromRgb(240, 240, 240));
 
     foreach (FeaturePtr feature, _boundary)
     {
