@@ -97,7 +97,7 @@ QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)
 
 QList<long> OSMHandler::features(double &x, double &y, double &maxDistance)
 {
-    QList<long> results;
+    QMap<long, long> results;
 
     QString sql =
             "select osm_way_refs.way_id "
@@ -122,14 +122,15 @@ QList<long> OSMHandler::features(double &x, double &y, double &maxDistance)
     {
         while (query.next())
         {
-            results.append(query.value(0).toLongLong());
+            long id = query.value(0).toLongLong();
+            results[id] = id;
         }
     }
     else
     {
         //qDebug() << sql << ": " << query.lastError().text();
     }
-    return results;
+    return results.keys();
 }
 
 QList<NodeAssociatedToWayPtr> OSMHandler::getPointFeatures(double &x, double &y,  double &maxDistance)
