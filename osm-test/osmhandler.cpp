@@ -16,40 +16,42 @@ OSMHandler::~OSMHandler()
     db.close();
 }
 
-long OSMHandler::nearestWay(double &x, double &y, double &threshold)
+WayPtr OSMHandler::nearestWay(double &x, double &y, double &threshold)
 {
-
     QList<long> candidates = nearestWays(x, y, threshold);
 
-    double angleThreshold = 45. / 180. * 3.141592654;
-
     double maxDist = 1e100;
-    long waySelected = -1;
+    WayPtr waySelected;
+    waySelected.clear();
+
     foreach (long way_id, candidates)
     {
-        Way way(this, way_id);
-        double dist = way.pointInWay(x, y);
+        WayPtr way = WayPtr::create(this, way_id);
+        double dist = way->pointInWay(x, y);
         if (dist < maxDist)
         {
-            waySelected = way_id;
+            waySelected = way;
             maxDist = dist;
         }
     }
     return waySelected;
 }
 
-long OSMHandler::nearestWay(double &x, double &y, double &direction, double &threshold)
+WayPtr OSMHandler::nearestWay(double &x, double &y, double &direction, double &threshold)
 {
     QList<long> candidates = nearestWays(x, y, threshold);
 
     double angleThreshold = 45. / 180. * 3.141592654;
+    WayPtr waySelected;
+    waySelected.clear();
+
     foreach (long way_id, candidates)
     {
-        Way way(this, way_id);
-        if (way.pointInWay(x, y, direction, angleThreshold))
-            return way_id;
+        WayPtr way = WayPtr::create(this, way_id);
+        if (way->pointInWay(x, y, direction, angleThreshold))
+            return way;
     }
-    return -1;
+    return waySelected;
 }
 
 QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)

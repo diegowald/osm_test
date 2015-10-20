@@ -24,11 +24,16 @@ public:
 
 signals:
 
+
 public slots:
 
-private:
+protected:
+    virtual QPointF transformToWidgetCoords(QPointF realPoint);
     double scale();
-    QPointF transformToWidgetCoords(QPointF realPoint);
+
+
+private:
+
     void drawWay(QPainter &painter, FeaturePtr feature);
     void drawSignal(QPainter &painter, NodeAssociatedToWayPtr node);
     QPixmap pixmap(NodeAssociatedToWayPtr node);
@@ -67,14 +72,16 @@ private:
     void drawPolygon(QPainter &painter, FeaturePtr feature, QColor &borderColor, QColor &color);
     void drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth);
 
-private:
-    double _maxDistance;
+protected:
     double _carX;
     double _carY;
-
-    QList<WayPtr> _ways;
     double _vehicleDirection;
     double _rotation;
+
+private:
+    double _maxDistance;
+
+    QList<WayPtr> _ways;
 
     QList<WayPtr> _linearFeatures;
     QList<NodeAssociatedToWayPtr> _pointFeatures;

@@ -6,6 +6,8 @@
 #include "nodeassociatedtoway.h"
 #include "osmpoint.h"
 
+class Way;
+typedef QSharedPointer<Way> WayPtr;
 
 class OSMHandler : public QObject
 {
@@ -15,8 +17,8 @@ public:
     OSMHandler(const QString &databaseFile, QObject *parent = 0);
     virtual ~OSMHandler();
 
-    long nearestWay(double &x, double &y, double &direction, double &threshold);
-    long nearestWay(double &x, double &y, double &threshold);
+    WayPtr nearestWay(double &x, double &y, double &direction, double &threshold);
+    WayPtr nearestWay(double &x, double &y, double &threshold);
     QList<long> nearestWays(double &x, double &y, double &threshold);
 
     long wayByNodeId(long nodeId);

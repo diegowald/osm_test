@@ -357,7 +357,7 @@ void MapViewWidget::classifyFeatures()
         }
         else
         {
-            qDebug() << way->toString();
+            //qDebug() << way->toString();
         }
     }
 }

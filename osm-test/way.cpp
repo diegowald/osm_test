@@ -1,5 +1,6 @@
 #include "way.h"
 #include "vector2d.h"
+#include <QDebug>
 
 #define MAXDIST 1e100;
 
@@ -25,7 +26,10 @@ double Way::pointInWay(double &x, double &y, double &direction, double &threshol
         double distance = pointInSegment(x, y, i);
         if (distance < maxDistance)
         {
-            maxDistance = distance;
+            if (isDirectionAlignedToSegment(i, direction, threshold))
+            {
+                maxDistance = distance;
+            }
             //return isDirectionAlignedToSegment(i, direction, threshold);
         }
     }
@@ -131,8 +135,12 @@ double Way::segmentOrientation(int lastIndex)
 {
     OSMPointPtr pt1 = _points.at(lastIndex - 1);
     OSMPointPtr pt2 = _points.at(lastIndex);
-    Vector2D v(pt1->x(), pt1->y(), pt2->x(), pt2->y());
-    return v.angle();
+
+    double deltaX = pt2->x() - pt1->x();
+    double deltaY = pt2->y() - pt1->y();
+
+    qDebug() << deltaY << " / " << deltaX << "= " << 3 * 3.141592654 / 2 * atan2(deltaY, deltaX);
+    return 3 * 3.141592654 / 2 * atan2(deltaY, deltaX);
 }
 
 double Way::getOrientation(double &x, double &y, double &direction)
@@ -141,6 +149,7 @@ double Way::getOrientation(double &x, double &y, double &direction)
     {
         if (pointInSegment(x, y, i))
         {
+            qDebug() << direction << " " << segmentOrientation(i) << " " << direction + 3.141592654;
             return segmentOrientation(i);
         }
     }
