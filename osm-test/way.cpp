@@ -120,10 +120,13 @@ double Way::distToSegment(double xp, double yp,
 bool Way::isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold)
 {
     double angle = segmentOrientation(lastIndex);
+    qDebug() << "angle " << angle << ", vehicle " << direction;
     double deltaAngle = fabs(angle - direction);
+    qDebug() << deltaAngle ;
     if (deltaAngle <= threshold)
         return true;
-    deltaAngle = fabs(angle - direction + 3.141592654 / 2);
+    deltaAngle = fabs(deltaAngle - 3.141592654);
+    qDebug() << deltaAngle;
     return deltaAngle <= threshold;
 }
 
