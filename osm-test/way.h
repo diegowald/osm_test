@@ -12,7 +12,7 @@ class Way : public Feature
 public:
     explicit Way(OSMHandler *osmHandler, long way_id, QObject *parent = 0);
 
-    double pointInWay(double &x, double &y, double &direction, double &threshold);
+    double pointInWay(double &x, double &y, double &direction, double &threshold, double &speed);
     double pointInWay(double &x, double &y);
 
     QList<OSMPointPtr> points() const;

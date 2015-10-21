@@ -17,7 +17,7 @@ public:
     OSMHandler(const QString &databaseFile, QObject *parent = 0);
     virtual ~OSMHandler();
 
-    WayPtr nearestWay(double &x, double &y, double &direction, double &threshold);
+    WayPtr nearestWay(double &x, double &y, double &direction, double &threshold, double &speed);
     WayPtr nearestWay(double &x, double &y, double &threshold);
     QList<long> nearestWays(double &x, double &y, double &threshold);
 

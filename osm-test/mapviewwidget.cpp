@@ -11,6 +11,7 @@ MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
     _carY = 0.;
 
     _rotation = 0;
+    _drawVehicle = true;
 }
 
 void MapViewWidget::paintEvent(QPaintEvent *evt)
@@ -26,12 +27,15 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
     //    pt.setX((width() - pix.width())/2);
     //    pt.setY((height() - pix.height())/2);
 
-    pt.setX(_carX);
-    pt.setY(_carY);
-    pt = transformToWidgetCoords(pt);
-    pt.setX(pt.x() - pix.width() / 2);
-    pt.setY(pt.y() - pix.height() / 2);
-    painter.drawPixmap(pt, pix);
+    if (_drawVehicle)
+    {
+        pt.setX(_carX);
+        pt.setY(_carY);
+        pt = transformToWidgetCoords(pt);
+        pt.setX(pt.x() - pix.width() / 2);
+        pt.setY(pt.y() - pix.height() / 2);
+        painter.drawPixmap(pt, pix);
+    }
 
     for (int i = 0; i < _prevX.count(); ++i)
     {
@@ -616,4 +620,9 @@ void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &
         painter.drawText(pt0, feature->value("name", ""));
     }
 
+}
+
+void MapViewWidget::drawVehicle(bool drawIt)
+{
+    _drawVehicle = drawIt;
 }

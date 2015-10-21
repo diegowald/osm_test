@@ -22,6 +22,8 @@ public:
     void setLinearFeatures(QList<WayPtr> &features);
     void setPointFeatures(QList<NodeAssociatedToWayPtr> &pts);
 
+    void drawVehicle(bool drawIt);
+
 signals:
 
 
@@ -31,8 +33,6 @@ protected:
     virtual QPointF transformToWidgetCoords(QPointF realPoint);
     double scale();
 
-
-private:
 
     void drawWay(QPainter &painter, FeaturePtr feature);
     void drawSignal(QPainter &painter, NodeAssociatedToWayPtr node);
@@ -78,7 +78,6 @@ protected:
     double _vehicleDirection;
     double _rotation;
 
-private:
     double _maxDistance;
 
     QList<WayPtr> _ways;
@@ -117,6 +116,7 @@ private:
 
     QList<double> _prevX;
     QList<double> _prevY;
+    bool _drawVehicle;
 };
 
 #endif // MAPVIEWWIDGET_H

@@ -256,7 +256,7 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     direction = speed > 0 ? direction : 0;
 
 
-    QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction);
+    QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction, speed);
     ui->nodeInformation->setRowCount(0);
 
     foreach (NodeAssociatedToWayPtr node, nodes)
@@ -293,7 +293,8 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
         //row++;
     }
 
-    WayPtr way = _signalDetector->getCurrentWay(X, Y, direction);
+    WayPtr way = _signalDetector->getCurrentWay(X, Y, direction, speed);
+    qDebug() << way->id();
     double orientation = 0;
     if (!way.isNull())
     {
@@ -312,8 +313,8 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     ui->forwardViewWidget->setLinearFeatures(features);
     ui->forwardViewWidget->setPointFeatures(pts);
     ui->forwardViewWidget->setRotation(orientation);
-    ui->forwardViewWidget->repaint();
-
+    ui->forwardViewWidget->setSelectedWay(way->id());
+    ui->forwardViewWidget->drawVehicle(false);
     ui->forwardViewWidget->repaint();
 
     

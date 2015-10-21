@@ -4,6 +4,9 @@
 #include <QVariant>
 #include "way.h"
 
+#include <QDebug>
+
+
 OSMHandler::OSMHandler(const QString &databaseFile, QObject *parent) : QObject(parent)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
@@ -28,28 +31,38 @@ WayPtr OSMHandler::nearestWay(double &x, double &y, double &threshold)
     {
         WayPtr way = WayPtr::create(this, way_id);
         double dist = way->pointInWay(x, y);
+
+        qDebug() << way->id() << " dist = " << dist;
         if (dist < maxDist)
         {
             waySelected = way;
             maxDist = dist;
+            qDebug() << "Select " <<  way->id() << " dist = " << maxDist;
         }
     }
     return waySelected;
 }
 
-WayPtr OSMHandler::nearestWay(double &x, double &y, double &direction, double &threshold)
+WayPtr OSMHandler::nearestWay(double &x, double &y, double &direction, double &threshold, double &speed)
 {
     QList<long> candidates = nearestWays(x, y, threshold);
 
+    qDebug() << candidates.count();
     double angleThreshold = 45. / 180. * 3.141592654;
     WayPtr waySelected;
     waySelected.clear();
 
+    double maxDistance = 1e100;
+
     foreach (long way_id, candidates)
     {
         WayPtr way = WayPtr::create(this, way_id);
-        if (way->pointInWay(x, y, direction, angleThreshold))
-            return way;
+        double distance = way->pointInWay(x, y, direction, angleThreshold, speed);
+        if (distance < maxDistance)
+        {
+            waySelected = way;
+            maxDistance = distance;
+        }
     }
     return waySelected;
 }
@@ -74,10 +87,10 @@ QList<long> OSMHandler::nearestWays(double &x, double &y, double &threshold)
     query.bindValue(":x2", x + threshold / 2);
     query.bindValue(":y1", y - threshold / 2);
     query.bindValue(":y2", y + threshold / 2);
-//qDebug() << sql;
-//qDebug() << ":x" << x;
-//qDebug() << ":y"<< y;
-//qDebug() << ":maxDist" << threshold;
+    //qDebug() << sql;
+    //qDebug() << ":x" << x;
+    //qDebug() << ":y"<< y;
+    //qDebug() << ":maxDist" << threshold;
 
     if (query.exec())
     {
@@ -113,10 +126,10 @@ QList<long> OSMHandler::features(double &x, double &y, double &maxDistance)
     query.bindValue(":x2", x + maxDistance / 2);
     query.bindValue(":y1", y - maxDistance / 2);
     query.bindValue(":y2", y + maxDistance / 2);
-//qDebug() << sql;
-//qDebug() << ":x" << x;
-//qDebug() << ":y"<< y;
-//qDebug() << ":maxDist" << threshold;
+    //qDebug() << sql;
+    //qDebug() << ":x" << x;
+    //qDebug() << ":y"<< y;
+    //qDebug() << ":maxDist" << threshold;
 
     if (query.exec())
     {

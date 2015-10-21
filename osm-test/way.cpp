@@ -18,15 +18,15 @@ Way::Way(OSMHandler *osmHandler, long way_id, QObject *parent) : Feature(parent)
 }
 
 
-double Way::pointInWay(double &x, double &y, double &direction, double &threshold)
+double Way::pointInWay(double &x, double &y, double &direction, double &threshold, double &speed)
 {
     double maxDistance = MAXDIST;
     for (int i = 1; i < _points.count(); ++i)
     {
-        double distance = pointInSegment(x, y, i);
+        double distance = distToSegment(x, y, i);// pointInSegment(x, y, i);
         if (distance < maxDistance)
         {
-            if (isDirectionAlignedToSegment(i, direction, threshold))
+            if ((speed == 0.) || isDirectionAlignedToSegment(i, direction, threshold))
             {
                 maxDistance = distance;
             }
@@ -98,9 +98,11 @@ double Way::distToSegmentSquared(double xp, double yp,
 
     double t = ((xp - xv) * (xw - xv) + (yp - yv) * (yw - yv)) / l2;
 
-    if (t < 0) return dist2(xp, yp, xv, yv);
+    if (t < 0)
+        return dist2(xp, yp, xv, yv);
 
-    if (t > 1) return dist2(xp, yp, xw, yw);
+    if (t > 1)
+        return dist2(xp, yp, xw, yw);
 
     return dist2(xp, yp,
                  xv + t * (xw - xv),
@@ -140,20 +142,29 @@ double Way::segmentOrientation(int lastIndex)
     double deltaY = pt2->y() - pt1->y();
 
     qDebug() << deltaY << " / " << deltaX << "= " << 3 * 3.141592654 / 2 * atan2(deltaY, deltaX);
-    return 3 * 3.141592654 / 2 * atan2(deltaY, deltaX);
+
+    double angle =  /*3.141592654 / 2 * */ atan2(deltaY, deltaX)  + 3.141592654 / 2;
+
+    angle = (angle > 2. * 3.141592654) ? angle - 2. * 3.141592654 : angle;
+    angle = (angle < 0) ? angle + 2. * 3.141592654 : angle;
+    return angle;
 }
 
 double Way::getOrientation(double &x, double &y, double &direction)
 {
+    double maxDistance = 1e100;
+    int idx = -1;
     for (int i = 1; i < _points.count(); ++i)
     {
-        if (pointInSegment(x, y, i))
+        double dist = distToSegment(x, y, i);
+        if (dist < maxDistance)
         {
-            qDebug() << direction << " " << segmentOrientation(i) << " " << direction + 3.141592654;
-            return segmentOrientation(i);
+            maxDistance = dist;
+            idx = i;
         }
     }
-    return 0;
+    qDebug() << direction << " " << segmentOrientation(idx) << " " << direction + 3.141592654;
+    return idx > -1 ? segmentOrientation(idx) : 0;
 }
 
 int Way::numPoints()

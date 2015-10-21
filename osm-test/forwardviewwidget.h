@@ -13,6 +13,7 @@ public:
     explicit ForwardViewWidget(QWidget *parent = 0);
     virtual void paintEvent(QPaintEvent *evt);
 
+    void setSelectedWay(long id);
     //void setMaxDistance(double distance);
 
     //void setVehicleCoordinates(double X, double Y);
@@ -116,6 +117,7 @@ private:
    //
    //QList<double> _prevX;
    //QList<double> _prevY;
+    long _selectedWay;
 };
 
 #endif // FORWARDVIEWWIDGET_H
