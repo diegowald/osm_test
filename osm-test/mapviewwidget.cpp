@@ -470,6 +470,7 @@ void MapViewWidget::drawWaterWays(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawHighways(QPainter &painter, FeaturePtr feature)
 {
+    drawWay(painter, feature);
 }
 
 void MapViewWidget::drawGreenAreas(QPainter &painter, FeaturePtr feature)
@@ -528,6 +529,9 @@ void MapViewWidget::drawHistoric(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawLanduse(QPainter &painter, FeaturePtr feature)
 {
+    QColor border = QColor::fromRgb(0, 128, 0);
+    QColor fillColor = QColor::fromRgb(12, 128, 12);
+    drawPolygon(painter, feature, border, fillColor);
 }
 
 void MapViewWidget::drawLeisure(QPainter &painter, FeaturePtr feature)

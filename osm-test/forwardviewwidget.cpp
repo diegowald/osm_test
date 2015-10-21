@@ -38,7 +38,10 @@ void ForwardViewWidget::paintEvent(QPaintEvent *evt)
         if (feature->id() == _selectedWay)
         {
             QColor color = QColor::fromRgb(10, 10, 10);
-            int w = 25;
+            int w = 10 * feature->value("lanes", "1").toInt();
+            drawPolyline(painter, feature, color, w);
+            w = 3;
+            color = QColor::fromRgb(255, 255, 0);
             drawPolyline(painter, feature, color, w);
             break;
         }

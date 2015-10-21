@@ -294,7 +294,6 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     }
 
     WayPtr way = _signalDetector->getCurrentWay(X, Y, direction, speed);
-    qDebug() << way->id();
     double orientation = 0;
     if (!way.isNull())
     {
@@ -313,7 +312,7 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     ui->forwardViewWidget->setLinearFeatures(features);
     ui->forwardViewWidget->setPointFeatures(pts);
     ui->forwardViewWidget->setRotation(orientation);
-    ui->forwardViewWidget->setSelectedWay(way->id());
+    ui->forwardViewWidget->setSelectedWay(way.isNull() ? 0 : way->id());
     ui->forwardViewWidget->drawVehicle(false);
     ui->forwardViewWidget->repaint();
 

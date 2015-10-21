@@ -28,7 +28,10 @@ QList<NodeAssociatedToWayPtr> WaySignalDetector::getUpcommingSignals(double &x, 
     WayPtr nearestWay = _handler->nearestWay(x, y, direction, maxDistance, speed);
     //WayPtr nearestWay = _handler->nearestWay(x, y, maxDistance);
 
-    nodes = _handler->getInfoNodes(nearestWay->id(), x, y, maxDistance);
+    if (!nearestWay.isNull())
+    {
+        nodes = _handler->getInfoNodes(nearestWay->id(), x, y, maxDistance);
+    }
     return nodes;
 }
 
