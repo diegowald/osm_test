@@ -327,4 +327,8 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     ui->mapWidget->setLinearFeatures(features);
     ui->mapWidget->setPointFeatures(pts);
     ui->mapWidget->repaint();
+
+    ui->forwardWidget2->setWays(features);
+    ui->forwardWidget2->setSelectedWay(way.isNull() ? 0 : way->id());
+    ui->forwardWidget2->repaint();
 }

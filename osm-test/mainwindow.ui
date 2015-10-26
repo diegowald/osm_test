@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>679</height>
+    <width>828</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -204,6 +204,16 @@
          </widget>
         </item>
         <item>
+         <widget class="ForwardViewSchemeWidget" name="forwardWidget2" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>150</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QTableWidget" name="nodeInformation">
           <column>
            <property name="text">
@@ -252,8 +262,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>677</width>
-     <height>24</height>
+     <width>828</width>
+     <height>27</height>
     </rect>
    </property>
   </widget>
@@ -279,6 +289,12 @@
    <class>MapViewWidget</class>
    <extends>QWidget</extends>
    <header location="global">mapviewwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ForwardViewSchemeWidget</class>
+   <extends>QWidget</extends>
+   <header>forwardviewschemewidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

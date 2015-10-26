@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     mapviewwidget.cpp \
     mapcache.cpp \
     feature.cpp \
-    gpscoordinate.cpp
+    gpscoordinate.cpp \
+    forwardviewschemewidget.cpp
 
 HEADERS  += mainwindow.h \
     nodeassociatedtoway.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     mapviewwidget.h \
     mapcache.h \
     feature.h \
-    gpscoordinate.h
+    gpscoordinate.h \
+    forwardviewschemewidget.h
 
 FORMS    += mainwindow.ui
 

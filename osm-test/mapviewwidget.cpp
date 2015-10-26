@@ -174,7 +174,7 @@ void MapViewWidget::drawWay(QPainter &painter, FeaturePtr feature)
     {}
     else if (value == "path")
     {}
-    drawPolyline(painter, feature, color, w);
+    drawPolyline(painter, feature, color, w, Qt::SolidLine);
 }
 
 
@@ -576,7 +576,7 @@ void MapViewWidget::drawBridge(QPainter &painter, FeaturePtr feature)
     int w = lanes.toInt() * 8;
     QColor color;
     color = QColor::fromRgb(0x35, 0x35, 0x35);
-    drawPolyline(painter, feature, color, w);
+    drawPolyline(painter, feature, color, w, Qt::SolidLine);
 }
 
 void MapViewWidget::drawPolygon(QPainter &painter, FeaturePtr feature, QColor &borderColor, QColor &color)
@@ -602,7 +602,7 @@ void MapViewWidget::drawPolygon(QPainter &painter, FeaturePtr feature, QColor &b
     }
 }
 
-void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth)
+void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth, Qt::PenStyle penStyle)
 {
     if (feature.isNull())
         return;
@@ -617,6 +617,7 @@ void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &
             QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
             QPen pen(color);
             pen.setWidth(penWidth);
+            pen.setStyle(penStyle);
             painter.setPen(pen);
             painter.drawLine(pt0, pt1);
             pt0 = pt1;
@@ -624,6 +625,32 @@ void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &
         painter.drawText(pt0, feature->value("name", ""));
     }
 
+}
+
+void MapViewWidget::drawPolylineWithOffset(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth, Qt::PenStyle penStyle, double offsetX)
+{
+    if (feature.isNull())
+        return;
+    if (feature->numPoints() > 1)
+    {
+        WayPtr way = qSharedPointerDynamicCast<Way>(feature);
+        OSMPointPtr p = way->points().at(0);
+        QPointF pt0 = transformToWidgetCoords(QPointF(p->x(), p->y()));
+        pt0.setX(pt0.x() + offsetX);
+        for (int i = 1; i < way->points().count(); ++i)
+        {
+            p = way->points().at(i);
+            QPointF pt1 = transformToWidgetCoords(QPointF(p->x(), p->y()));
+            pt1.setX(pt1.x() + offsetX);
+            QPen pen(color);
+            pen.setWidth(penWidth);
+            pen.setStyle(penStyle);
+            painter.setPen(pen);
+            painter.drawLine(pt0, pt1);
+            pt0 = pt1;
+        }
+        painter.drawText(pt0, feature->value("name", ""));
+    }
 }
 
 void MapViewWidget::drawVehicle(bool drawIt)

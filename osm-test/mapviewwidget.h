@@ -70,7 +70,8 @@ protected:
     void drawBridge(QPainter &painter, FeaturePtr feature);
 
     void drawPolygon(QPainter &painter, FeaturePtr feature, QColor &borderColor, QColor &color);
-    void drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth);
+    void drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth, Qt::PenStyle penStyle);
+    void drawPolylineWithOffset(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth, Qt::PenStyle penStyle, double offsetX);
 
 protected:
     double _carX;

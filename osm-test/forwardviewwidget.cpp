@@ -22,7 +22,7 @@ QPointF ForwardViewWidget::transformToWidgetCoords(QPointF realPoint)
     double x0 = rotatedX * scale();
     double y0 = rotatedY * scale();
 
-    return QPointF(x0 + geometry().width() / 2., geometry().height() / 2 - y0);
+    return QPointF(x0 + geometry().width() / 2., geometry().height() /*/ 2*/ - y0);
 }
 
 void ForwardViewWidget::paintEvent(QPaintEvent *evt)
@@ -38,14 +38,19 @@ void ForwardViewWidget::paintEvent(QPaintEvent *evt)
         if (feature->id() == _selectedWay)
         {
             QColor color = QColor::fromRgb(10, 10, 10);
-            int w = 10 * feature->value("lanes", "1").toInt();
-            drawPolyline(painter, feature, color, w);
-            w = 3;
+            int streetWidth = 30 * feature->value("lanes", "1").toInt();
+            drawPolyline(painter, feature, color, streetWidth, Qt::SolidLine);
+
+            int w = 2;
             color = QColor::fromRgb(255, 255, 0);
-            drawPolyline(painter, feature, color, w);
+            drawPolylineWithOffset(painter, feature, color, w, Qt::DashLine, streetWidth / 2 - 3);
+            drawPolylineWithOffset(painter, feature, color, w, Qt::DashLine, -( streetWidth / 2 - 3));
             break;
         }
     }
+
+    painter.setPen(QColor::fromRgb(255, 0, 20));
+    painter.drawEllipse(QPoint(width() / 2, height()), 2, 3);
 }
 
 void ForwardViewWidget::setSelectedWay(long id)
