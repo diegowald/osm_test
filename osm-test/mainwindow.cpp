@@ -216,6 +216,10 @@ void MainWindow::on_moveLocation()
     currentYPos = _coordinates.at(elapsedTime)->y();
     currentZPos = _coordinates.at(elapsedTime)->z();
     int delayToNext = _coordinates.at(elapsedTime)->delayToNextCoord();
+    // Remove this
+        if (currentSpeed == 0)
+            delayToNext = 1;
+    //end of Remove This
     elapsedTime++;
     if (elapsedTime >= _coordinates.count())
     {
@@ -247,10 +251,12 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     direction = 3 * 3.141592654 / 2 + atan2(deltaY, deltaX);
     //direction = (currentDirection -90) * 3.141592654 / 180.;
     //direction = 3.141592654 / 2 - direction;
+    direction = (direction > 2. * 3.141592654) ? direction - 2. * 3.141592654 : direction;
+    direction = (direction < 0) ? direction + 2. * 3.141592654 : direction;
     direction = speed > 0 ? direction : 0;
 
 
-    QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction);
+    QList<NodeAssociatedToWayPtr> nodes = _signalDetector->getUpcommingSignals(X, Y, direction, speed);
     ui->nodeInformation->setRowCount(0);
 
     foreach (NodeAssociatedToWayPtr node, nodes)
@@ -287,24 +293,32 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
         //row++;
     }
 
-    WayPtr way = _signalDetector->getCurrentWay(X, Y, direction);
-    double orientation = way->getOrientation(X, Y, direction);
+    WayPtr way = _signalDetector->getCurrentWay(X, Y, direction, speed);
+    double orientation = 0;
+    if (!way.isNull())
+    {
+        orientation = way->getOrientation(X, Y, direction);
+    }
     QList<WayPtr> intersectionWays = _signalDetector->getIntersectionWays(intersections);
     double maxDist = _signalDetector->getMaxDistance();
 
-    ui->forwardViewWidget->setMaxDistance(maxDist);
+    QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);
+    QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
+    intersectionWays = _mapCache->nearestWays(X, Y, 1.5 * maxDist);
+    ui->forwardViewWidget->setMaxDistance(maxDist / 3);
     ui->forwardViewWidget->setVehicleCoordinates(X, Y);
-    ui->forwardViewWidget->setCurrentWay(way);
-    ui->forwardViewWidget->setIntersectionWays(intersectionWays);
-    ui->forwardViewWidget->setSignals(nodes);
-    ui->forwardViewWidget->setIntersectionNodes(intersections);
-    ui->forwardViewWidget->setRotation(orientation);
+    ui->forwardViewWidget->setWays(intersectionWays);
     ui->forwardViewWidget->setVehicleDirection(direction);
+    ui->forwardViewWidget->setLinearFeatures(features);
+    ui->forwardViewWidget->setPointFeatures(pts);
+    ui->forwardViewWidget->setRotation(orientation);
+    ui->forwardViewWidget->setSelectedWay(way.isNull() ? 0 : way->id());
+    ui->forwardViewWidget->drawVehicle(false);
     ui->forwardViewWidget->repaint();
 
     
-    QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);
-    QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
+    //QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);
+    //QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
     intersectionWays = _mapCache->nearestWays(X, Y, 1.5 * maxDist);
     ui->mapWidget->setMaxDistance(maxDist / 3);
     ui->mapWidget->setVehicleCoordinates(X, Y);

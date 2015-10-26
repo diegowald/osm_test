@@ -11,6 +11,7 @@ MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
     _carY = 0.;
 
     _rotation = 0;
+    _drawVehicle = true;
 }
 
 void MapViewWidget::paintEvent(QPaintEvent *evt)
@@ -26,12 +27,15 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
     //    pt.setX((width() - pix.width())/2);
     //    pt.setY((height() - pix.height())/2);
 
-    pt.setX(_carX);
-    pt.setY(_carY);
-    pt = transformToWidgetCoords(pt);
-    pt.setX(pt.x() - pix.width() / 2);
-    pt.setY(pt.y() - pix.height() / 2);
-    painter.drawPixmap(pt, pix);
+    if (_drawVehicle)
+    {
+        pt.setX(_carX);
+        pt.setY(_carY);
+        pt = transformToWidgetCoords(pt);
+        pt.setX(pt.x() - pix.width() / 2);
+        pt.setY(pt.y() - pix.height() / 2);
+        painter.drawPixmap(pt, pix);
+    }
 
     for (int i = 0; i < _prevX.count(); ++i)
     {
@@ -357,7 +361,7 @@ void MapViewWidget::classifyFeatures()
         }
         else
         {
-            qDebug() << way->toString();
+            //qDebug() << way->toString();
         }
     }
 }
@@ -377,7 +381,7 @@ void MapViewWidget::paintMap(QPainter &painter)
     geo.setTop(0);
     geo.setWidth(width());
     geo.setHeight(height());
-    painter.fillRect(geo, Qt::lightGray);
+    painter.fillRect(geo, QColor::fromRgb(240, 240, 240));
 
     foreach (FeaturePtr feature, _boundary)
     {
@@ -466,6 +470,7 @@ void MapViewWidget::drawWaterWays(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawHighways(QPainter &painter, FeaturePtr feature)
 {
+    drawWay(painter, feature);
 }
 
 void MapViewWidget::drawGreenAreas(QPainter &painter, FeaturePtr feature)
@@ -524,6 +529,9 @@ void MapViewWidget::drawHistoric(QPainter &painter, FeaturePtr feature)
 
 void MapViewWidget::drawLanduse(QPainter &painter, FeaturePtr feature)
 {
+    QColor border = QColor::fromRgb(0, 128, 0);
+    QColor fillColor = QColor::fromRgb(12, 128, 12);
+    drawPolygon(painter, feature, border, fillColor);
 }
 
 void MapViewWidget::drawLeisure(QPainter &painter, FeaturePtr feature)
@@ -616,4 +624,9 @@ void MapViewWidget::drawPolyline(QPainter &painter, FeaturePtr feature, QColor &
         painter.drawText(pt0, feature->value("name", ""));
     }
 
+}
+
+void MapViewWidget::drawVehicle(bool drawIt)
+{
+    _drawVehicle = drawIt;
 }

@@ -22,13 +22,18 @@ public:
     void setLinearFeatures(QList<WayPtr> &features);
     void setPointFeatures(QList<NodeAssociatedToWayPtr> &pts);
 
+    void drawVehicle(bool drawIt);
+
 signals:
+
 
 public slots:
 
-private:
+protected:
+    virtual QPointF transformToWidgetCoords(QPointF realPoint);
     double scale();
-    QPointF transformToWidgetCoords(QPointF realPoint);
+
+
     void drawWay(QPainter &painter, FeaturePtr feature);
     void drawSignal(QPainter &painter, NodeAssociatedToWayPtr node);
     QPixmap pixmap(NodeAssociatedToWayPtr node);
@@ -67,14 +72,15 @@ private:
     void drawPolygon(QPainter &painter, FeaturePtr feature, QColor &borderColor, QColor &color);
     void drawPolyline(QPainter &painter, FeaturePtr feature, QColor &color, int penWidth);
 
-private:
-    double _maxDistance;
+protected:
     double _carX;
     double _carY;
-
-    QList<WayPtr> _ways;
     double _vehicleDirection;
     double _rotation;
+
+    double _maxDistance;
+
+    QList<WayPtr> _ways;
 
     QList<WayPtr> _linearFeatures;
     QList<NodeAssociatedToWayPtr> _pointFeatures;
@@ -110,6 +116,7 @@ private:
 
     QList<double> _prevX;
     QList<double> _prevY;
+    bool _drawVehicle;
 };
 
 #endif // MAPVIEWWIDGET_H

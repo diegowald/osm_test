@@ -15,10 +15,10 @@ public:
 
     virtual ~WaySignalDetector();
 
-    QList<NodeAssociatedToWayPtr> getUpcommingSignals(double &x, double &y, double &direction);
+    QList<NodeAssociatedToWayPtr> getUpcommingSignals(double &x, double &y, double &direction, double &speed);
     QList<NodeAssociatedToWayPtr> getUpcommingIntersections(double &x, double &y, double &direction);
 
-    WayPtr getCurrentWay(double &x, double &y, double &direction);
+    WayPtr getCurrentWay(double &x, double &y, double &direction, double &speed);
     QList<WayPtr> getIntersectionWays(QList<NodeAssociatedToWayPtr> intersections);
 
     double getMaxDistance();
