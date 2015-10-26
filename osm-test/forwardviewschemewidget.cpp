@@ -146,4 +146,14 @@ void ForwardViewSchemeWidget::drawVehicle()
 
 void ForwardViewSchemeWidget::drawVehicleDirection()
 {
+    QPainter painter(this);
+    QPixmap pix(":/signals/arrow");
+    pix = pix.scaled(40, 60, Qt::KeepAspectRatio);
+    QPointF pt;
+    //    pt.setX((width() - pix.width())/2);
+    //    pt.setY((height() - pix.height())/2);
+
+    pt.setX((_streetWidth - pix.width()) / 2);
+    pt.setY(height() - pix.height() - 3);
+    painter.drawPixmap(pt, pix);
 }

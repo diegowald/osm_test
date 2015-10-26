@@ -7,5 +7,6 @@
         <file alias="Limit30">5_speed limit 30.png</file>
         <file alias="car">car.png</file>
         <file alias="redCar">Red-car.png</file>
+        <file alias="arrow">arrow.png</file>
     </qresource>
 </RCC>

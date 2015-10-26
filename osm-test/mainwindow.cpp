@@ -305,7 +305,7 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);
     QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
     intersectionWays = _mapCache->nearestWays(X, Y, 1.5 * maxDist);
-    ui->forwardViewWidget->setMaxDistance(maxDist / 3);
+    /*ui->forwardViewWidget->setMaxDistance(maxDist / 3);
     ui->forwardViewWidget->setVehicleCoordinates(X, Y);
     ui->forwardViewWidget->setWays(intersectionWays);
     ui->forwardViewWidget->setVehicleDirection(direction);
@@ -314,7 +314,7 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     ui->forwardViewWidget->setRotation(orientation);
     ui->forwardViewWidget->setSelectedWay(way.isNull() ? 0 : way->id());
     ui->forwardViewWidget->drawVehicle(false);
-    ui->forwardViewWidget->repaint();
+    ui->forwardViewWidget->repaint();*/
 
     
     //QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>828</width>
-    <height>700</height>
+    <height>856</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -194,21 +194,11 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="ForwardViewWidget" name="forwardViewWidget" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>300</width>
-            <height>300</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="ForwardViewSchemeWidget" name="forwardWidget2" native="true">
           <property name="minimumSize">
            <size>
             <width>300</width>
-            <height>150</height>
+            <height>300</height>
            </size>
           </property>
          </widget>
@@ -279,12 +269,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>ForwardViewWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">forwardviewwidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>MapViewWidget</class>
    <extends>QWidget</extends>
