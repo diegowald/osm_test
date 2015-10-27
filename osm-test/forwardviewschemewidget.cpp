@@ -1,5 +1,6 @@
 #include "forwardviewschemewidget.h"
 #include <QPainter>
+#include <QDebug>
 
 ForwardViewSchemeWidget::ForwardViewSchemeWidget(QWidget *parent) : QWidget(parent)
 {
@@ -41,6 +42,7 @@ void ForwardViewSchemeWidget::setVehicleCoordinates(double X, double Y)
 
 void ForwardViewSchemeWidget::setVehicleDirection(double direction)
 {
+    _vehicleDirection = direction;
 }
 
 void ForwardViewSchemeWidget::setWays(QList<WayPtr> &ways)
@@ -54,6 +56,7 @@ void ForwardViewSchemeWidget::setWays(QList<WayPtr> &ways)
 
 void ForwardViewSchemeWidget::setRotation(double alpha)
 {
+    _StreetRotation = alpha;
 }
 
 void ForwardViewSchemeWidget::setLinearFeatures(QList<WayPtr> &features)
@@ -152,6 +155,19 @@ void ForwardViewSchemeWidget::drawVehicleDirection()
     QPointF pt;
     //    pt.setX((width() - pix.width())/2);
     //    pt.setY((height() - pix.height())/2);
+
+    qDebug() << _StreetRotation << ", " << _vehicleDirection;
+
+    double streeAngle = _StreetRotation * 180 / 3.141592654;
+    double carAngle = _vehicleDirection * 180 / 3.141592654;
+    qDebug() << "Angle: " << streeAngle - carAngle;
+    double a = streeAngle - carAngle;
+    if (fabs(a) > 90)
+        a += 180.0;
+
+    QTransform transform;
+    QTransform t = transform.rotate(a);
+    pix = pix.transformed(t);
 
     pt.setX((_streetWidth - pix.width()) / 2);
     pt.setY(height() - pix.height() - 3);

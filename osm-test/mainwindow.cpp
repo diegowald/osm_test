@@ -217,8 +217,8 @@ void MainWindow::on_moveLocation()
     currentZPos = _coordinates.at(elapsedTime)->z();
     int delayToNext = _coordinates.at(elapsedTime)->delayToNextCoord();
     // Remove this
-        if (currentSpeed == 0)
-            delayToNext = 1;
+    if (currentSpeed == 0)
+        delayToNext = 1;
     //end of Remove This
     elapsedTime++;
     if (elapsedTime >= _coordinates.count())
@@ -320,7 +320,7 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     //QList<WayPtr> features = _mapCache->getLinearFeatures(X, Y, 1.5 * maxDist);
     //QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
     intersectionWays = _mapCache->nearestWays(X, Y, 1.5 * maxDist);
-    ui->mapWidget->setMaxDistance(maxDist / 3);
+    ui->mapWidget->setMaxDistance(maxDist / 5);
     ui->mapWidget->setVehicleCoordinates(X, Y);
     ui->mapWidget->setWays(intersectionWays);
     ui->mapWidget->setVehicleDirection(direction);
@@ -330,5 +330,8 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
 
     ui->forwardWidget2->setWays(features);
     ui->forwardWidget2->setSelectedWay(way.isNull() ? 0 : way->id());
+    ui->forwardWidget2->setVehicleDirection(direction);
+    ui->forwardWidget2->setRotation(orientation);
+    ui->forwardWidget2->setPointFeatures(pts);
     ui->forwardWidget2->repaint();
 }
