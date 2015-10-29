@@ -32,7 +32,7 @@ private:
     void drawSignals();
     void drawVehicle();
     void drawVehicleDirection();
-
+    void drawLaneNumber(int number, int laneWidth);
 
 signals:
 
@@ -44,6 +44,7 @@ private:
     double _StreetRotation;
     double _vehicleDirection;
     int _streetWidth;
+    QList<NodeAssociatedToWayPtr> _symbols;
 };
 
 #endif // FORWARDVIEWSCHEMEWIDGET_H

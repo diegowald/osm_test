@@ -8,5 +8,10 @@
         <file alias="car">car.png</file>
         <file alias="redCar">Red-car.png</file>
         <file alias="arrow">arrow.png</file>
+        <file alias="1">1.png</file>
+        <file alias="2">2.png</file>
+        <file alias="3">3.png</file>
+        <file alias="4">4.png</file>
+        <file alias="5">5.png</file>
     </qresource>
 </RCC>

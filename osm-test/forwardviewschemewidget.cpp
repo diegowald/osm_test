@@ -65,6 +65,7 @@ void ForwardViewSchemeWidget::setLinearFeatures(QList<WayPtr> &features)
 
 void ForwardViewSchemeWidget::setPointFeatures(QList<NodeAssociatedToWayPtr> &pts)
 {
+    _symbols = pts;
 }
 
 void ForwardViewSchemeWidget::setSelectedWay(long id)
@@ -111,9 +112,29 @@ void ForwardViewSchemeWidget::drawLanes()
             geo.setWidth(6);
             geo.setHeight(height());
             painter.fillRect(geo, QColor::fromRgb(255, 255, 255));
-            painter.drawText(6 + i * w/ 2, 30, QString::number(i + 1));
+            drawLaneNumber(i, w);
         }
     }
+    else
+    {
+        drawLaneNumber(1, _streetWidth);
+    }
+}
+
+void ForwardViewSchemeWidget::drawLaneNumber(int number, int laneWidth)
+{
+    QPainter painter(this);
+    QString resource = ":/signals/%1";
+    resource = resource.arg(number);
+    QPixmap pix(resource);
+    pix = pix.scaled(60, 60, Qt::KeepAspectRatio);
+    QPointF pt;
+    //    pt.setX((width() - pix.width())/2);
+    //    pt.setY((height() - pix.height())/2);
+
+    pt.setX((6 + number * laneWidth - pix.width()) / 2);
+    pt.setY(3);
+    painter.drawPixmap(pt, pix);
 }
 
 void ForwardViewSchemeWidget::drawBoundaryLine()
@@ -131,6 +152,57 @@ void ForwardViewSchemeWidget::drawBoundaryLine()
 
 void ForwardViewSchemeWidget::drawSignals()
 {
+    QPainter painter(this);
+    QString symbol = ":/signals/%1";
+    QString selectedSymbol = "";
+    // detect street orientation:
+    foreach (FeaturePtr feature, _symbols)
+    {
+        selectedSymbol.clear();
+        QString value = feature->value("highway", "");
+        qDebug() << value;
+        if (value == "give_way")
+        {
+            selectedSymbol = "";
+        }
+        if (value == "stop")
+        {
+            selectedSymbol = "stop";
+        }
+        if (value == "traffic_signals")
+        {
+            selectedSymbol = "";
+        }
+        if (selectedSymbol.length() > 0)
+        {
+            selectedSymbol = symbol.arg(selectedSymbol);
+            QPixmap pix(selectedSymbol);
+            pix.scaled(30, 30, Qt::KeepAspectRatio);
+            QPointF pt;
+
+            pt.setX(width() - 15);
+            pt.setY(15);
+            painter.drawPixmap(pt, pix);
+        }
+    }
+
+    if (_selectedWay != 0)
+    {
+        WayPtr way = _ways[_selectedWay];
+        QString value = way->value("maxspeed", "0");
+        if (value != 0)
+        {
+            selectedSymbol = "Limit30";
+            selectedSymbol = symbol.arg(selectedSymbol);
+            QPixmap pix(selectedSymbol);
+            pix = pix.scaled(40, 40, Qt::KeepAspectRatio);
+            QPointF pt;
+
+            pt.setX(width() - 40);
+            pt.setY(height() - 40);
+            painter.drawPixmap(pt, pix);
+        }
+    }
 }
 
 void ForwardViewSchemeWidget::drawVehicle()

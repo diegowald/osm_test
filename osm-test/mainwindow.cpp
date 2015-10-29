@@ -332,6 +332,6 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     ui->forwardWidget2->setSelectedWay(way.isNull() ? 0 : way->id());
     ui->forwardWidget2->setVehicleDirection(direction);
     ui->forwardWidget2->setRotation(orientation);
-    ui->forwardWidget2->setPointFeatures(pts);
+    ui->forwardWidget2->setPointFeatures(nodes);
     ui->forwardWidget2->repaint();
 }

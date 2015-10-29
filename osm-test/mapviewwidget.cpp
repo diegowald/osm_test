@@ -195,22 +195,42 @@ void MapViewWidget::setVehicleDirection(double direction)
 
 QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
 {
-    QString signalType = node->value("highway", "");
-    QPixmap pix;
-    if (signalType == "traffic_signals")
-    {
-        pix = QPixmap(":/signals/stop");
-    }
-    else
-    {
-        pix =  QPixmap(":/signals/noParking");
-    }
+
+    QString symbol = ":/signals/%1";
+    QString selectedSymbol = "";
+    // detect street orientation:
+        selectedSymbol.clear();
+        QString value = node->value("highway", "");
+        qDebug() << value;
+        if (value == "give_way")
+        {
+            selectedSymbol = "";
+        }
+        if (value == "stop")
+        {
+            selectedSymbol = "stop";
+        }
+        if (value == "traffic_signals")
+        {
+            selectedSymbol = "";
+        }
+        else
+            qDebug() << value;
+        if (selectedSymbol.length() > 0)
+        {
+            selectedSymbol = symbol.arg(selectedSymbol);
+            QPixmap pix(selectedSymbol);
+            pix.scaled(30, 30, Qt::KeepAspectRatio);
+            return pix;
+        }
+
     /*    turning_circle
     bus_stop
     speed_camera
     street_lamp
 */
-    return pix.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+//    return pix.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    return QPixmap();
 }
 
 void MapViewWidget::setLinearFeatures(QList<WayPtr> &features)
