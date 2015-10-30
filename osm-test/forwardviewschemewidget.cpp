@@ -190,17 +190,20 @@ void ForwardViewSchemeWidget::drawSignals()
     {
         WayPtr way = _ways[_selectedWay];
         QString value = way->value("maxspeed", "0");
-        if (value != 0)
+        if (value != "0")
         {
-            selectedSymbol = "Limit30";
+            selectedSymbol = "speedLimit";
             selectedSymbol = symbol.arg(selectedSymbol);
             QPixmap pix(selectedSymbol);
-            pix = pix.scaled(40, 40, Qt::KeepAspectRatio);
+            QPainter p2(&pix);
+            p2.setFont(QFont("Arial", 150));
+            p2.drawText(QPoint(300, 300), value);
+            QPixmap pix2 = pix.scaled(40, 40, Qt::KeepAspectRatio);
             QPointF pt;
 
             pt.setX(width() - 40);
             pt.setY(height() - 40);
-            painter.drawPixmap(pt, pix);
+            painter.drawPixmap(pt, pix2);
         }
     }
 }

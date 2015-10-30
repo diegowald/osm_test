@@ -13,5 +13,6 @@
         <file alias="3">3.png</file>
         <file alias="4">4.png</file>
         <file alias="5">5.png</file>
+        <file alias="speedLimit">5_speed limit.png</file>
     </qresource>
 </RCC>
