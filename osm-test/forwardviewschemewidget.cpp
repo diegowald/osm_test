@@ -197,12 +197,12 @@ void ForwardViewSchemeWidget::drawSignals()
             QPixmap pix(selectedSymbol);
             QPainter p2(&pix);
             p2.setFont(QFont("Arial", 150));
-            p2.drawText(QPoint(300, 300), value);
-            QPixmap pix2 = pix.scaled(40, 40, Qt::KeepAspectRatio);
+            p2.drawText(QPoint(290, 330), value);
+            QPixmap pix2 = pix.scaled(50, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation);
             QPointF pt;
 
-            pt.setX(width() - 40);
-            pt.setY(height() - 40);
+            pt.setX(width() - 50);
+            pt.setY(height() - 50);
             painter.drawPixmap(pt, pix2);
         }
     }
