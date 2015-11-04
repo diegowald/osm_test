@@ -60,7 +60,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }*/
 
 
-    QFile file("driving_20150922.xml");
+    //QFile file("driving_20150922.xml");
+    QFile file("HY_0011_20151028_101141_N_2CH.xml");
+
     file.open(QFile::ReadOnly);
     xmlReader.setDevice(&file);
 
@@ -69,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (xmlReader.isStartElement() && xmlReader.name() == "root")
     {
         xmlReader.readNextStartElement();
-        if (xmlReader.name() == "driving")
+        if (xmlReader.name() == "driving" || xmlReader.name() == "region")
         {
             while (xmlReader.readNextStartElement())
             {
@@ -97,15 +99,15 @@ MainWindow::MainWindow(QWidget *parent) :
                         {
                             longitude = xmlReader.readElementText();
                         }
-                        else if (xmlReader.name() == "x")
+                        else if (xmlReader.name() == "x" || xmlReader.name() == "eCompass_x")
                         {
                             x = xmlReader.readElementText();
                         }
-                        else if (xmlReader.name() == "y")
+                        else if (xmlReader.name() == "y" || xmlReader.name() == "eCompass_y")
                         {
                             y = xmlReader.readElementText();
                         }
-                        else if (xmlReader.name() == "z")
+                        else if (xmlReader.name() == "z" || xmlReader.name() == "eCompass_z")
                         {
                             z = xmlReader.readElementText();
                         }
