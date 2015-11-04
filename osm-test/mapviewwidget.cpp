@@ -1,7 +1,6 @@
 #include "mapviewwidget.h"
 #include <QPaintEvent>
 #include <QPainter>
-#include <QDebug>
 
 MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
 {
@@ -29,8 +28,8 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
 
     if (_drawVehicle)
     {
-        pt.setX(_carX);
-        pt.setY(_carY);
+        pt.setX(/*_carX*/ _carXSnap);
+        pt.setY(/*_carY*/ _carYSnap);
         pt = transformToWidgetCoords(pt);
         pt.setX(pt.x() - pix.width() / 2);
         pt.setY(pt.y() - pix.height() / 2);
@@ -41,6 +40,15 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
     {
         pt.setX(_prevX.at(i));
         pt.setY(_prevY.at(i));
+        pt = transformToWidgetCoords(pt);
+        painter.drawEllipse(pt, 3, 3);
+    }
+
+    painter.setPen(Qt::red);
+    for (int i = 0; i < _snapX.count(); ++i)
+    {
+        pt.setX(_snapX.at(i));
+        pt.setY(_snapY.at(i));
         pt = transformToWidgetCoords(pt);
         painter.drawEllipse(pt, 3, 3);
     }
@@ -57,18 +65,22 @@ double MapViewWidget::scale()
 }
 
 
-void MapViewWidget::setVehicleCoordinates(double X, double Y)
+void MapViewWidget::setVehicleCoordinates(double X, double Y, double snapX, double snapY)
 {
     _prevX.append(_carX);
     _prevY.append(_carY);
     _carX = X;
     _carY = Y;
+    _snapX.append(snapX);
+    _snapY.append(snapY);
+    _carXSnap = snapX;
+    _carYSnap = snapY;
 }
 
 QPointF MapViewWidget::transformToWidgetCoords(QPointF realPoint)
 {
-    double xR1 = realPoint.x() - _carX;
-    double yR1 = realPoint.y() - _carY;
+    double xR1 = realPoint.x() - /*_carX*/ _carXSnap;
+    double yR1 = realPoint.y() - /*_carY*/ _carYSnap;
 
     double rotatedX = + cos(-_vehicleDirection) * xR1 - sin(-_vehicleDirection) * yR1;
     double rotatedY = + sin(-_vehicleDirection) * xR1 + cos(-_vehicleDirection) * yR1;
@@ -201,7 +213,7 @@ QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
     // detect street orientation:
         selectedSymbol.clear();
         QString value = node->value("highway", "");
-        qDebug() << value;
+        //qDebug() << value;
         if (value == "give_way")
         {
             selectedSymbol = "";
@@ -214,8 +226,8 @@ QPixmap MapViewWidget::pixmap(NodeAssociatedToWayPtr node)
         {
             selectedSymbol = "";
         }
-        else
-            qDebug() << value;
+        /*else
+            qDebug() << value;*/
         if (selectedSymbol.length() > 0)
         {
             selectedSymbol = symbol.arg(selectedSymbol);

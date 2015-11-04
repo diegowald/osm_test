@@ -21,6 +21,9 @@ public:
 
     virtual int numPoints();
 
+    QPair<double, double> projectPoint(double &x, double &y);
+
+
 private:
     bool pointInSegment(double &x, double& y, int lastIndex);
     bool isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold);

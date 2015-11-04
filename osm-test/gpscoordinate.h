@@ -17,6 +17,16 @@ public:
     QString speed,
     QObject *parent = 0);
 
+    explicit GPSCoordinate(QString time,
+    double latitude,
+    double longitude,
+    double x,
+    double y,
+    double z,
+    double wheel,
+    double speed,
+    QObject *parent = 0);
+
     QString time() const;
     double latitude() const;
     double longitude() const;

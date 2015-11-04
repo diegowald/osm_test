@@ -4,7 +4,6 @@
 #include <QVariant>
 #include "way.h"
 
-#include <QDebug>
 
 
 OSMHandler::OSMHandler(const QString &databaseFile, QObject *parent) : QObject(parent)
@@ -32,12 +31,12 @@ WayPtr OSMHandler::nearestWay(double &x, double &y, double &threshold)
         WayPtr way = WayPtr::create(this, way_id);
         double dist = way->pointInWay(x, y);
 
-        qDebug() << way->id() << " dist = " << dist;
+        //qDebug() << way->id() << " dist = " << dist;
         if (dist < maxDist)
         {
             waySelected = way;
             maxDist = dist;
-            qDebug() << "Select " <<  way->id() << " dist = " << maxDist;
+            //qDebug() << "Select " <<  way->id() << " dist = " << maxDist;
         }
     }
     return waySelected;
@@ -47,7 +46,7 @@ WayPtr OSMHandler::nearestWay(double &x, double &y, double &direction, double &t
 {
     QList<long> candidates = nearestWays(x, y, threshold);
 
-    qDebug() << candidates.count();
+    //qDebug() << candidates.count();
     double angleThreshold = 45. / 180. * 3.141592654;
     WayPtr waySelected;
     waySelected.clear();

@@ -13,6 +13,18 @@ GPSCoordinate::GPSCoordinate(QString time, QString latitude, QString longitude, 
     _delayToNextCoord = 100;
 }
 
+GPSCoordinate::GPSCoordinate(QString time, double latitude, double longitude, double x, double y, double z, double wheel, double speed, QObject *parent) : QObject(parent)
+{
+    _time = time;
+    _latitude = latitude;
+    _longitude = longitude;
+    _x = x;
+    _y = y;
+    _z = z;
+    _wheel = wheel;
+    _speed = speed;
+    _delayToNextCoord = 100;
+}
 
 QString GPSCoordinate::time() const
 {

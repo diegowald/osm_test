@@ -13,7 +13,7 @@ public:
 
     void setMaxDistance(double distance);
 
-    void setVehicleCoordinates(double X, double Y);
+    void setVehicleCoordinates(double X, double Y, double snapX, double snapY);
     void setVehicleDirection(double direction);
 
     void setWays(QList<WayPtr> &ways);
@@ -76,6 +76,8 @@ protected:
 protected:
     double _carX;
     double _carY;
+    double _carXSnap;
+    double _carYSnap;
     double _vehicleDirection;
     double _rotation;
 
@@ -117,6 +119,10 @@ protected:
 
     QList<double> _prevX;
     QList<double> _prevY;
+
+    QList<double> _snapX;
+    QList<double> _snapY;
+
     bool _drawVehicle;
 };
 

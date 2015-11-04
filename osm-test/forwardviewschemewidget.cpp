@@ -165,13 +165,17 @@ void ForwardViewSchemeWidget::drawSignals()
         {
             selectedSymbol = "";
         }
-        if (value == "stop")
+        else if (value == "stop")
         {
             selectedSymbol = "stop";
         }
-        if (value == "traffic_signals")
+        else if (value == "traffic_signals")
         {
             selectedSymbol = "";
+        }
+        else
+        {
+            qDebug() << value;
         }
         if (selectedSymbol.length() > 0)
         {

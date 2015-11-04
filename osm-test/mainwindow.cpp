@@ -295,9 +295,12 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
 
     WayPtr way = _signalDetector->getCurrentWay(X, Y, direction, speed);
     double orientation = 0;
+    QPair<double, double> snappedPos;
     if (!way.isNull())
     {
         orientation = way->getOrientation(X, Y, direction);
+        snappedPos = way->projectPoint(X, Y);
+        qDebug() << X << ", " << Y << "==> " << snappedPos.first << ", " << snappedPos.second;
     }
     QList<WayPtr> intersectionWays = _signalDetector->getIntersectionWays(intersections);
     double maxDist = _signalDetector->getMaxDistance();
@@ -321,7 +324,7 @@ void MainWindow::queryDatabase(double X, double Y, double speed)
     //QList<NodeAssociatedToWayPtr> pts = _mapCache->getPointFeatures(X, Y, 1.5 * maxDist);
     intersectionWays = _mapCache->nearestWays(X, Y, 1.5 * maxDist);
     ui->mapWidget->setMaxDistance(maxDist / 5);
-    ui->mapWidget->setVehicleCoordinates(X, Y);
+    ui->mapWidget->setVehicleCoordinates(X, Y, snappedPos.first, snappedPos.second);
     ui->mapWidget->setWays(intersectionWays);
     ui->mapWidget->setVehicleDirection(direction);
     ui->mapWidget->setLinearFeatures(features);

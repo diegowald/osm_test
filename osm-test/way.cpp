@@ -1,6 +1,6 @@
 #include "way.h"
 #include "vector2d.h"
-#include <QDebug>
+#include <QPair>
 
 #define MAXDIST 1e100;
 
@@ -120,13 +120,13 @@ double Way::distToSegment(double xp, double yp,
 bool Way::isDirectionAlignedToSegment(int lastIndex, double &direction, double &threshold)
 {
     double angle = segmentOrientation(lastIndex);
-    qDebug() << "angle " << angle << ", vehicle " << direction;
+    //qDebug() << "angle " << angle << ", vehicle " << direction;
     double deltaAngle = fabs(angle - direction);
-    qDebug() << deltaAngle ;
+    //qDebug() << deltaAngle ;
     if (deltaAngle <= threshold)
         return true;
     deltaAngle = fabs(deltaAngle - 3.141592654);
-    qDebug() << deltaAngle;
+    //qDebug() << deltaAngle;
     return deltaAngle <= threshold;
 }
 
@@ -144,7 +144,7 @@ double Way::segmentOrientation(int lastIndex)
     double deltaX = pt2->x() - pt1->x();
     double deltaY = pt2->y() - pt1->y();
 
-    qDebug() << deltaY << " / " << deltaX << "= " << 3 * 3.141592654 / 2 * atan2(deltaY, deltaX);
+    //qDebug() << deltaY << " / " << deltaX << "= " << 3 * 3.141592654 / 2 * atan2(deltaY, deltaX);
 
     double angle =  /*3.141592654 / 2 * */ atan2(deltaY, deltaX)  + 3.141592654 / 2;
 
@@ -166,11 +166,62 @@ double Way::getOrientation(double &x, double &y, double &direction)
             idx = i;
         }
     }
-    qDebug() << direction << " " << segmentOrientation(idx) << " " << direction + 3.141592654;
+    //qDebug() << direction << " " << segmentOrientation(idx) << " " << direction + 3.141592654;
     return idx > -1 ? segmentOrientation(idx) : 0;
 }
 
 int Way::numPoints()
 {
     return _points.length();
+}
+
+QPair<double, double> Way::projectPoint(double &x, double &y)
+{
+    QPair<double, double> result;
+    result.first = x;
+    result.second = y;
+    int segmentIdx = -1;
+    for (int i = 1; i < _points.count(); ++i)
+    {
+        if (pointInSegment(x, y, i))
+        {
+            segmentIdx = i;
+            break;
+        }
+    }
+
+    if (segmentIdx == -1)
+        return result;
+
+    double xv = _points.at(segmentIdx - 1)->x();
+    double yv = _points.at(segmentIdx - 1)->y();
+    double xw = _points.at(segmentIdx)->x();
+    double yw = _points.at(segmentIdx)->y();
+
+    double l2 = dist2(xv, yv, xw, yw);
+    if (l2 == 0.)
+    {
+        result.first = xv;
+        result.second = yv;
+        return result;
+    }
+
+    double t = ((x - xv) * (xw - xv) + (y - yv) * (yw - yv)) / l2;
+
+    if (t < 0)
+    {
+        result.first = xv;
+        result.second = yv;
+    } else if (t > 1)
+    {
+        result.first = xw;
+        result.second = yw;
+        return result;
+    }
+    else
+    {
+        result.first = xv + t * (xw - xv);
+        result.second = yv + t * (yw - yv);
+    }
+    return result;
 }

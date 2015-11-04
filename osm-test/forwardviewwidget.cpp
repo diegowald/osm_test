@@ -1,7 +1,6 @@
 #include "forwardviewwidget.h"
 #include <QPaintEvent>
 #include <QPainter>
-#include <QDebug>
 #include <QtMath>
 
 ForwardViewWidget::ForwardViewWidget(QWidget *parent) : MapViewWidget(parent)
