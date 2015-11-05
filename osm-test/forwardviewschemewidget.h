@@ -11,12 +11,19 @@ class ForwardViewSchemeWidget : public QWidget
 public:
     explicit ForwardViewSchemeWidget(QWidget *parent = 0);
 
+    // This is the most important function
     virtual void paintEvent(QPaintEvent *evt);
 
+    // establish the current vehicle position
     void setVehicleCoordinates(double X, double Y);
+
+    // establish the current vehicle northing.
     void setVehicleDirection(double direction);
 
+    // Sets the ways nearby.
     void setWays(QList<WayPtr> &ways);
+
+
     void setRotation(double alpha);
 
     void setLinearFeatures(QList<WayPtr> &features);

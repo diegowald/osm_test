@@ -35,33 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _signalDetector = WaySignalDetectorPtr::create(_osmHandler);
     _mapCache = MapCachePtr::create(_osmHandler);
 
-    /*    if (sqlite3_open("map.sqlite", &db) == SQLITE_OK)
-    {
-    }
-
-    if (!sqlite3_enable_load_extension(db, 1))
-    {
-        std::string e = sqlite3_errmsg(db);
-        QString e1 = QString::fromStdString(e);
-
-    }
-
-    sqlite3_stmt *statement;
-    QString sql = "SELECT load_extension(\"/usr/lib/x86_64-linux-gnu/libspatialite.so.5\")";
-    if (sqlite3_prepare(db, sql.toStdString().c_str(), -1, &statement, 0) == SQLITE_OK)
-    {
-
-    }
-    else
-    {
-        std::string e = sqlite3_errmsg(db);
-        QString e1 = QString::fromStdString(e);
-        //qDebug() << e1;
-    }*/
-
-
     //QFile file("driving_20150922.xml");
-    QFile file("HY_0011_20151028_101141_N_2CH.xml");
+    //QFile file("HY_0011_20151028_101141_N_2CH.xml");
+    QFile file("HY_0012_20151028_101241_N_2CH.xml");
 
     file.open(QFile::ReadOnly);
     xmlReader.setDevice(&file);

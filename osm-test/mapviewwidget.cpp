@@ -45,6 +45,7 @@ void MapViewWidget::paintEvent(QPaintEvent *evt)
     }
 
     painter.setPen(Qt::red);
+    painter.setBrush(QBrush(QColor(Qt::red)));
     for (int i = 0; i < _snapX.count(); ++i)
     {
         pt.setX(_snapX.at(i));

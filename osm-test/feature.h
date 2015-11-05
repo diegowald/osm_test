@@ -12,11 +12,18 @@ class Feature : public QObject
 public:
     explicit Feature(QObject *parent = 0);
 
+
     void setId(long id);
+
+    // adds the key, value pair to feature dictionary.
     void addKeyValue(const QString &key, const QString &value);
 
+    // Converts feature to string, for debugging purposes.
     QString toString() const;
+
+    // retrieves the value from dictionary.
     QString value(const QString &key, const QString &defaultValue);
+
     long id() const;
 
     virtual int numPoints() = 0;
