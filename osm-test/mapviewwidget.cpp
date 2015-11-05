@@ -15,8 +15,8 @@ MapViewWidget::MapViewWidget(QWidget *parent) : QWidget(parent)
 
 void MapViewWidget::paintEvent(QPaintEvent *evt)
 {
+    (void) evt;
     QPainter painter(this);
-    QRect geo = this->geometry();
 
     paintMap(painter);
 
